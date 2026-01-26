@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = "edge";
+
 import AudioPlayer from "@/components/exam/AudioPlayer";
 import QuestionCard from "@/components/exam/QuestionCard";
 import QuestionNavigation from "@/components/exam/QuestionNavigation";

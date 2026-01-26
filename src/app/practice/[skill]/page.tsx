@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = "edge";
+
 import { useAppContent, useTests } from "@/hooks/useRealTime";
 import { SkillType } from "@/types";
 import Link from "next/link";
