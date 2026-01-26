@@ -1,7 +1,7 @@
 "use client";
 
 import AdminRoute from "@/components/auth/AdminRoute";
-import { ChevronRight, LayoutDashboard, Settings, Users } from "lucide-react";
+import { Database, LayoutDashboard, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
@@ -13,6 +13,7 @@ function AdminSidebar() {
     { href: "/admin/stats", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/users", label: "User Management", icon: Users },
     { href: "/admin/features", label: "App Features", icon: Settings },
+    { href: "/admin/questions", label: "Question Bank", icon: Database },
   ];
 
   return (
@@ -46,7 +47,6 @@ function AdminSidebar() {
                 />
                 <span className="font-semibold text-sm">{item.label}</span>
               </div>
-              {isActive && <ChevronRight size={14} />}
             </Link>
           );
         })}

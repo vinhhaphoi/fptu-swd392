@@ -88,10 +88,10 @@ export default function SkillCard({
           )}
         </div>
 
-        {/* Arrow */}
-        <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center group-hover:bg-indigo-500 transition-all duration-300">
+        {/* Arrow - Moved to top right to avoid overlapping progress bar */}
+        <div className="absolute top-6 right-6 w-8 h-8 rounded-full bg-foreground/5 flex items-center justify-center group-hover:bg-indigo-500 transition-all duration-300 shadow-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-0 translate-x-4">
           <svg
-            className="w-5 h-5 text-foreground/40 group-hover:text-white group-hover:translate-x-0.5 transition-all"
+            className="w-4 h-4 text-foreground/40 group-hover:text-white group-hover:translate-x-0.5 transition-all"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -99,7 +99,7 @@ export default function SkillCard({
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={2}
+              strokeWidth={3}
               d="M9 5l7 7-7 7"
             />
           </svg>

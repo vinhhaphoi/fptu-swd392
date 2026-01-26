@@ -32,6 +32,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   isAdmin: boolean;
   isModerator: boolean;
+  isBlocked: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,6 +41,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [userData, setUserData] = useState<DbUser | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const handleSignOut = async () => {
+    await authSignOut();
+    setUser(null);
+    setUserData(null);
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthChange((user) => {
@@ -64,11 +71,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
-  const handleSignOut = async () => {
-    await authSignOut();
-    setUser(null);
-    setUserData(null);
-  };
+  useEffect(() => {
+    if (userData?.isBlocked) {
+      setTimeout(() => {
+        handleSignOut();
+      }, 0);
+    }
+  }, [userData?.isBlocked]);
 
   const value: AuthContextType = {
     user,
@@ -80,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut: handleSignOut,
     isAdmin: userData?.role === "admin",
     isModerator: userData?.role === "admin" || userData?.role === "moderator",
+    isBlocked: !!userData?.isBlocked,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

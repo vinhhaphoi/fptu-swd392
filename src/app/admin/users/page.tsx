@@ -5,12 +5,16 @@ import { useUsers } from "@/hooks/useRealTime";
 import { deleteUser, updateUser } from "@/lib/db";
 import { User } from "@/types";
 import {
+  Ban,
   Calendar,
   Check,
+  CheckCircle2,
   Mail,
   Shield,
   Trash2,
+  UserCog,
   User as UserIcon,
+  UserX,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -30,6 +34,22 @@ export default function UserManagementPage() {
       setEditingId(null);
     } catch (error) {
       console.error("Failed to update role:", error);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleUpdateStatus = async (
+    uid: string,
+    status: User["status"],
+    isBlocked: boolean = false,
+  ) => {
+    if (uid === currentUser?.uid) return;
+    setActionLoading(uid);
+    try {
+      await updateUser(uid, { status, isBlocked });
+    } catch (error) {
+      console.error("Failed to update status:", error);
     } finally {
       setActionLoading(null);
     }
@@ -92,6 +112,9 @@ export default function UserManagementPage() {
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-foreground/40">
                   Created
                 </th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-foreground/40">
+                  Status
+                </th>
                 <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-foreground/40 text-right">
                   Actions
                 </th>
@@ -137,51 +160,18 @@ export default function UserManagementPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    {editingId === u.uid ? (
-                      <div className="flex items-center gap-2">
-                        <select
-                          value={newRole}
-                          onChange={(e) =>
-                            setNewRole(e.target.value as User["role"])
-                          }
-                          className="bg-background border border-card-border rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-                        >
-                          <option value="member">Member</option>
-                          <option value="moderator">Moderator</option>
-                          <option value="admin">Admin</option>
-                        </select>
-                        <button
-                          onClick={() => handleRoleUpdate(u.uid)}
-                          disabled={actionLoading === u.uid}
-                          className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-all disabled:opacity-50"
-                        >
-                          <Check size={16} />
-                        </button>
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setEditingId(u.uid);
-                          setNewRole(u.role || "member");
-                        }}
-                        className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all hover:scale-105 ${
-                          u.role === "admin"
-                            ? "bg-indigo-500/10 text-indigo-500"
-                            : u.role === "moderator"
-                              ? "bg-amber-500/10 text-amber-500"
-                              : "bg-foreground/5 text-foreground/40"
-                        }`}
-                      >
-                        <Shield size={12} />
-                        {u.role || "Member"}
-                      </button>
-                    )}
+                    <div
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                        u.role === "admin"
+                          ? "bg-indigo-500/10 text-indigo-500"
+                          : u.role === "moderator"
+                            ? "bg-amber-500/10 text-amber-500"
+                            : "bg-foreground/5 text-foreground/40"
+                      }`}
+                    >
+                      <Shield size={12} />
+                      {u.role || "Member"}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-foreground/60 flex items-center gap-1.5">
@@ -189,16 +179,132 @@ export default function UserManagementPage() {
                       {formatDate(u.createdAt)}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => handleDelete(u.uid)}
-                      disabled={
-                        u.uid === currentUser?.uid || actionLoading === u.uid
-                      }
-                      className="p-2 text-foreground/20 hover:text-red-500 hover:bg-red-500/5 rounded-xl transition-all disabled:opacity-0 disabled:pointer-events-none"
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${
+                        u.isBlocked
+                          ? "bg-red-500/10 text-red-500 border-red-500/20"
+                          : u.status === "restricted"
+                            ? "bg-amber-500/10 text-amber-500 border-amber-500/20"
+                            : "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                      }`}
                     >
-                      <Trash2 size={18} />
-                    </button>
+                      {u.isBlocked ? "Blocked" : u.status || "Active"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      {editingId === u.uid ? (
+                        <div className="flex items-center gap-1 bg-background border border-card-border p-1 rounded-xl shadow-lg animate-in zoom-in-95">
+                          <select
+                            value={newRole}
+                            onChange={(e) =>
+                              setNewRole(e.target.value as User["role"])
+                            }
+                            className="bg-transparent border-none outline-none px-2 py-1 text-xs font-bold uppercase tracking-widest text-foreground"
+                          >
+                            <option value="member">Member</option>
+                            <option value="moderator">Moderator</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                          <div className="flex gap-1 ml-1 pr-1">
+                            <button
+                              onClick={() => handleRoleUpdate(u.uid)}
+                              disabled={actionLoading === u.uid}
+                              className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-all disabled:opacity-50"
+                            >
+                              <Check size={14} />
+                            </button>
+                            <button
+                              onClick={() => setEditingId(null)}
+                              className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => {
+                              setEditingId(u.uid);
+                              setNewRole(u.role || "member");
+                            }}
+                            title="Change User Role"
+                            className="p-2 text-foreground/60 hover:text-indigo-500 hover:bg-indigo-500/10 rounded-xl transition-all"
+                          >
+                            <UserCog size={18} />
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              handleUpdateStatus(
+                                u.uid,
+                                u.isBlocked ? "active" : "blocked",
+                                !u.isBlocked,
+                              )
+                            }
+                            disabled={
+                              u.uid === currentUser?.uid ||
+                              actionLoading === u.uid
+                            }
+                            title={
+                              u.uid === currentUser?.uid
+                                ? "You cannot block yourself"
+                                : u.isBlocked
+                                  ? "Unblock User"
+                                  : "Block User"
+                            }
+                            className={`p-2 rounded-xl transition-all disabled:opacity-20 disabled:cursor-not-allowed ${
+                              u.isBlocked
+                                ? "text-emerald-500 hover:bg-emerald-500/10"
+                                : "text-amber-500 hover:bg-amber-500/10"
+                            }`}
+                          >
+                            {u.isBlocked ? (
+                              <CheckCircle2 size={18} />
+                            ) : (
+                              <Ban size={18} />
+                            )}
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              handleUpdateStatus(u.uid, "restricted", false)
+                            }
+                            disabled={
+                              u.uid === currentUser?.uid ||
+                              actionLoading === u.uid ||
+                              u.status === "restricted"
+                            }
+                            title={
+                              u.uid === currentUser?.uid
+                                ? "You cannot restrict yourself"
+                                : "Restrict User"
+                            }
+                            className="p-2 text-foreground/40 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+                          >
+                            <UserX size={18} />
+                          </button>
+
+                          <button
+                            onClick={() => handleDelete(u.uid)}
+                            disabled={
+                              u.uid === currentUser?.uid ||
+                              actionLoading === u.uid
+                            }
+                            title={
+                              u.uid === currentUser?.uid
+                                ? "You cannot delete yourself"
+                                : "Delete User"
+                            }
+                            className="p-2 text-foreground/20 hover:text-red-500 hover:bg-red-500/5 rounded-xl transition-all disabled:opacity-10 disabled:cursor-not-allowed"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -9,6 +9,9 @@ export interface User {
     lastLogin?: Date;
     longestStreak?: number;
     role?: "admin" | "moderator" | "member";
+    status?: "active" | "blocked" | "restricted";
+    isBlocked?: boolean;
+    blockedUntil?: Date;
 }
 
 export interface AppContentItem {
