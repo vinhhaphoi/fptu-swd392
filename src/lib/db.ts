@@ -9,6 +9,7 @@ import {
     query,
     serverTimestamp,
     setDoc,
+    updateDoc,
     where
 } from "firebase/firestore";
 import { db } from "./firebase";
@@ -138,12 +139,12 @@ export async function saveTestResult(result: Omit<TestResult, "id" | "completedA
 /**
  * Listen to user results
  */
-export function subscribeToUserResults(userId: string, callback: (results: TestResult[]) => void) {
+export function subscribeToUserResults(userId: string, callback: (results: TestResult[]) => void, limitCount: number = 20) {
     const q = query(
         collection(db, "results"),
         where("userId", "==", userId),
         orderBy("completedAt", "desc"),
-        limit(20)
+        limit(limitCount)
     );
 
     return onSnapshot(q, (snapshot) => {
@@ -157,6 +158,16 @@ export function subscribeToUserResults(userId: string, callback: (results: TestR
             } as TestResult);
         });
         callback(results);
+    });
+}
+
+/**
+ * Update user's last login timestamp
+ */
+export async function updateLastLogin(uid: string) {
+    const userRef = doc(db, "users", uid);
+    await updateDoc(userRef, {
+        lastLogin: serverTimestamp()
     });
 }
 

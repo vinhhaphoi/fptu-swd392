@@ -7,7 +7,7 @@ import {
   signInWithGoogle,
   signUp,
 } from "@/lib/auth";
-import { subscribeToUser } from "@/lib/db";
+import { subscribeToUser, updateLastLogin } from "@/lib/db";
 import { User as DbUser } from "@/types";
 import { User as FirebaseUser } from "firebase/auth";
 import {
@@ -53,6 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (user?.uid) {
+      updateLastLogin(user.uid);
       const unsubscribe = subscribeToUser(user.uid, (data) => {
         setUserData(data as DbUser);
         setLoading(false);

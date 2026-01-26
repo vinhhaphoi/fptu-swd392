@@ -99,3 +99,22 @@ export function useUserStatus(userId: string | null) {
 
   return { progress, recentResults, loading };
 }
+export function useAllUserResults(userId: string | null) {
+  const [results, setResults] = useState<TestResult[]>([]);
+  const [loading, setLoading] = useState(!!userId);
+
+  useEffect(() => {
+    if (!userId) return;
+    const unsub = subscribeToUserResults(
+      userId,
+      (data) => {
+        setResults(data);
+        setLoading(false);
+      },
+      100,
+    ); // Fetch up to 100 for stats
+    return () => unsub();
+  }, [userId]);
+
+  return { results, loading };
+}

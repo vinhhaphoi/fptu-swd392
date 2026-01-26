@@ -3,12 +3,14 @@
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { useAuth } from "@/hooks/useAuth";
-import { LEVELS, SKILLS_DATA, SkillType } from "@/types";
+import { useAllUserResults } from "@/hooks/useRealTime";
+import { LEVELS, SKILLS_DATA, SkillType, TestResult } from "@/types";
 import {
   Award,
   BookOpen,
   Calendar,
   Camera,
+  Clock,
   Flame,
   LogOut,
   Target,
@@ -18,7 +20,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ProfilePage() {
-  const { user, userData, loading, signOut } = useAuth();
+  const { user, userData, loading: authLoading, signOut } = useAuth();
+  const { results, loading: resultsLoading } = useAllUserResults(
+    user?.uid || null,
+  );
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -46,7 +51,13 @@ export default function ProfilePage() {
     router.push("/");
   };
 
-  if (loading) {
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/auth/login");
+    }
+  }, [user, authLoading, router]);
+
+  if (authLoading || (resultsLoading && results.length === 0)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
@@ -55,7 +66,6 @@ export default function ProfilePage() {
   }
 
   if (!user) {
-    router.push("/auth/login");
     return null;
   }
 
@@ -83,13 +93,52 @@ export default function ProfilePage() {
     }
   };
 
-  // Mock data for demonstration - in real app, these would come from userData or separate stats collection
+  // Calculate real stats from results
+  const testsCompleted = results.length;
+  const totalSeconds = results.reduce((acc, r) => acc + (r.duration || 0), 0);
+  const studyTime =
+    totalSeconds > 3600
+      ? `${Math.floor(totalSeconds / 3600)}h ${Math.floor((totalSeconds % 3600) / 60)}m`
+      : `${Math.floor(totalSeconds / 60)}m ${totalSeconds % 60}s`;
+
+  // Simple streak calculation
+  const calculateStreak = (results: TestResult[]) => {
+    if (!results.length) return 0;
+    const sortedDates = results
+      .map((r) => new Date(r.completedAt).toDateString())
+      .filter((v, i, a) => a.indexOf(v) === i);
+
+    let streak = 0;
+    const today = new Date().toDateString();
+    const yesterday = new Date(new Date().getTime() - 86400000).toDateString();
+
+    if (sortedDates[0] !== today && sortedDates[0] !== yesterday) return 0;
+
+    for (let i = 0; i < sortedDates.length; i++) {
+      streak++;
+      // If there's a next date, check if it's strictly the day before
+      if (i + 1 < sortedDates.length) {
+        const current = new Date(sortedDates[i]).getTime();
+        const next = new Date(sortedDates[i + 1]).getTime();
+        const oneDay = 86400000;
+        if (current - next > oneDay + 1000) break; // More than 24h gap (approx)
+      }
+    }
+    return streak;
+  };
+
+  const currentStreak = calculateStreak(results);
+
   const stats = {
-    testsCompleted: 15,
-    studyTime: "12h 30m",
-    currentStreak: 7,
-    longestStreak: 14,
+    testsCompleted,
+    studyTime,
+    currentStreak,
+    longestStreak: Math.max(
+      currentStreak,
+      userData?.longestStreak || currentStreak,
+    ),
     joinDate: formatDate(userData?.createdAt),
+    lastLogin: formatDate(userData?.lastLogin),
     level: userData?.targetLevel || "B2",
   };
 
@@ -164,6 +213,10 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-wider">
                   <Flame size={14} />
                   {stats.currentStreak} day streak
+                </div>
+                <div className="flex items-center gap-1.5 text-foreground/30 text-xs font-medium ml-1">
+                  <Clock size={14} />
+                  Last active {stats.lastLogin}
                 </div>
                 <div className="flex items-center gap-1.5 text-foreground/30 text-xs font-medium ml-1">
                   <Calendar size={14} />

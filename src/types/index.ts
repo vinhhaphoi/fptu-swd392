@@ -6,6 +6,8 @@ export interface User {
     photoURL: string | null;
     targetLevel?: "B1" | "B2" | "C1";
     createdAt?: Date;
+    lastLogin?: Date;
+    longestStreak?: number;
 }
 
 export interface AppContentItem {
