@@ -8,6 +8,7 @@ export interface User {
     createdAt?: Date;
     lastLogin?: Date;
     longestStreak?: number;
+    role?: "admin" | "moderator" | "member";
 }
 
 export interface AppContentItem {

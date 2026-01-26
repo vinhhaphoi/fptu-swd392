@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 
 export default function Header() {
-  const { user, userData, signOut, loading } = useAuth();
+  const { user, userData, signOut, loading, isModerator } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const router = useRouter();
@@ -115,13 +115,15 @@ export default function Header() {
                     >
                       My Results
                     </Link>
-                    <Link
-                      href="/admin/features"
-                      className="block px-4 py-3 text-indigo-500 hover:bg-indigo-500/5 transition-all border-t border-card-border"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      Admin Panel
-                    </Link>
+                    {isModerator && (
+                      <Link
+                        href="/admin/features"
+                        className="block px-4 py-3 text-indigo-500 hover:bg-indigo-500/5 transition-all border-t border-card-border"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        Admin Panel
+                      </Link>
+                    )}
                     <button
                       onClick={handleSignOut}
                       className="w-full text-left px-4 py-3 text-red-500 hover:bg-red-500/5 transition-all border-t border-card-border"

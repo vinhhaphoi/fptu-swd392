@@ -13,6 +13,7 @@ import {
   Clock,
   Flame,
   LogOut,
+  Shield,
   Target,
 } from "lucide-react";
 import Image from "next/image";
@@ -142,30 +143,44 @@ export default function ProfilePage() {
     level: userData?.targetLevel || "B2",
   };
 
+  // Calculate real skill progress
+  const skillProgress = (Object.keys(SKILLS_DATA) as SkillType[]).map(
+    (skill) => {
+      const skillResults = results.filter((r) => r.skill === skill);
+      const avgScore = skillResults.length
+        ? Math.round(
+            skillResults.reduce((acc, r) => acc + r.score, 0) /
+              skillResults.length,
+          )
+        : 0;
+      return { skill, avgScore };
+    },
+  );
+
   const achievements = [
     {
       icon: "🎯",
       title: "First Test",
       description: "Completed your first practice test",
-      earned: true,
+      earned: results.length > 0,
     },
     {
       icon: "🔥",
       title: "7 Day Streak",
       description: "Study 7 days in a row",
-      earned: true,
+      earned: currentStreak >= 7,
     },
     {
       icon: "🏆",
-      title: "B2 Master",
-      description: "Score 80%+ on all B2 tests",
-      earned: false,
+      title: `${stats.level} Master`,
+      description: `Score 80%+ on a ${stats.level} test`,
+      earned: results.some((r) => r.level === stats.level && r.score >= 80),
     },
     {
       icon: "⚡",
-      title: "Speed Demon",
-      description: "Complete a test in half the time",
-      earned: false,
+      title: "All-Rounder",
+      description: "Take a test in all 4 skills",
+      earned: new Set(results.map((r) => r.skill)).size >= 4,
     },
   ];
 
@@ -214,6 +229,10 @@ export default function ProfilePage() {
                   <Flame size={14} />
                   {stats.currentStreak} day streak
                 </div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-500 text-xs font-bold uppercase tracking-wider">
+                  <Shield size={14} />
+                  {userData?.role || "Member"}
+                </div>
                 <div className="flex items-center gap-1.5 text-foreground/30 text-xs font-medium ml-1">
                   <Clock size={14} />
                   Last active {stats.lastLogin}
@@ -237,7 +256,7 @@ export default function ProfilePage() {
               <Button
                 variant="ghost"
                 onClick={handleSignOut}
-                className="rounded-2xl px-6 text-foreground/40 hover:text-red-500 hover:bg-red-500/5"
+                className="rounded-2xl px-6 text-red-500 hover:bg-red-500/10 hover:text-red-600"
               >
                 <LogOut size={18} className="mr-2" />
                 Sign Out
@@ -346,10 +365,8 @@ export default function ProfilePage() {
             Learning Progress
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {(Object.keys(SKILLS_DATA) as SkillType[]).map((skill) => {
+            {skillProgress.map(({ skill, avgScore }) => {
               const data = SKILLS_DATA[skill];
-              const progress = 65; // Fixed value for now to avoid purity error
-
               return (
                 <div key={skill} className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -364,13 +381,13 @@ export default function ProfilePage() {
                       </span>
                     </div>
                     <span className="text-sm font-black text-foreground/40">
-                      {progress}%
+                      {avgScore}%
                     </span>
                   </div>
                   <div className="h-2.5 bg-foreground/5 rounded-full overflow-hidden">
                     <div
                       className={`h-full bg-gradient-to-r ${data.color} transition-all duration-1000`}
-                      style={{ width: `${progress}%` }}
+                      style={{ width: `${avgScore}%` }}
                     />
                   </div>
                 </div>

@@ -24,11 +24,12 @@ export default function Button({
   const variants = {
     primary:
       "bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-[1.02]",
-    secondary: "bg-slate-700 text-white hover:bg-slate-600",
-    outline:
-      "border-2 border-indigo-500 text-indigo-400 hover:bg-indigo-500/10",
-    ghost: "text-slate-300 hover:bg-white/5 hover:text-white",
-    danger: "bg-red-500 text-white hover:bg-red-600",
+    secondary:
+      "bg-foreground/5 text-foreground hover:bg-foreground/10 border border-card-border",
+    outline: "border border-indigo-500 text-indigo-500 hover:bg-indigo-500/5",
+    ghost: "text-foreground/60 hover:text-foreground hover:bg-foreground/5",
+    danger:
+      "bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20",
   };
 
   const sizes = {

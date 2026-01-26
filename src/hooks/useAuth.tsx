@@ -30,6 +30,8 @@ interface AuthContextType {
   ) => Promise<FirebaseUser>;
   signInWithGoogle: () => Promise<FirebaseUser>;
   signOut: () => Promise<void>;
+  isAdmin: boolean;
+  isModerator: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -76,6 +78,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signUp,
     signInWithGoogle,
     signOut: handleSignOut,
+    isAdmin: userData?.role === "admin",
+    isModerator: userData?.role === "admin" || userData?.role === "moderator",
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

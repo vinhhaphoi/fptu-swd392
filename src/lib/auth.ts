@@ -37,6 +37,7 @@ export async function signUp(email: string, password: string, displayName: strin
         lastLogin: serverTimestamp(),
         createdAt: serverTimestamp(),
         targetLevel: "B2",
+        role: "member",
     }, { merge: true });
 
     return user;
@@ -70,12 +71,14 @@ export async function signInWithGoogle() {
         updatedAt: serverTimestamp(),
     }, { merge: true });
 
-    // Ensure createdAt exists
+    // Ensure createdAt and role exist
     const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (!userDoc.data()?.createdAt) {
+    const userData = userDoc.data();
+    if (!userData?.createdAt || !userData?.role) {
         await setDoc(doc(db, "users", user.uid), {
-            createdAt: serverTimestamp(),
-            targetLevel: "B2",
+            createdAt: userData?.createdAt || serverTimestamp(),
+            targetLevel: userData?.targetLevel || "B2",
+            role: userData?.role || "member",
         }, { merge: true });
     }
 
