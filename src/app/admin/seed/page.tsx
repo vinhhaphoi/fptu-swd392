@@ -4,7 +4,6 @@ import Button from "@/components/ui/Button";
 import { db } from "@/lib/firebase";
 import { SKILLS_DATA } from "@/types";
 import { doc, serverTimestamp, writeBatch } from "firebase/firestore";
-import Link from "next/link";
 import { useState } from "react";
 
 export default function SeedPage() {
@@ -146,16 +145,21 @@ export default function SeedPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="max-w-md w-full bg-card p-8 rounded-2xl border border-card-border shadow-2xl">
+    <div className="p-8">
+      <div className="max-w-md mx-auto bg-card p-8 rounded-[32px] border border-card-border shadow-2xl">
         <h1 className="text-2xl font-bold mb-4 text-foreground text-center">
           Firebase Seeding Tool
         </h1>
-        <p className="text-foreground/60 mb-8 text-center">
+        <p className="text-foreground/60 mb-8 text-center text-sm">
           This will populate your Firestore collections with initial content
           (stats, features, skills, and sample tests).
         </p>
-        <Button fullWidth size="lg" onClick={seedData} loading={loading}>
+        <Button
+          fullWidth
+          onClick={seedData}
+          loading={loading}
+          className="rounded-2xl py-4"
+        >
           Push Data to Firebase
         </Button>
         {status && (
@@ -165,14 +169,6 @@ export default function SeedPage() {
             {status}
           </div>
         )}
-        <div className="mt-8 pt-6 border-t border-card-border">
-          <Link
-            href="/"
-            className="text-indigo-500 hover:text-indigo-600 font-medium block text-center"
-          >
-            Back to Home
-          </Link>
-        </div>
       </div>
     </div>
   );

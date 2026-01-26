@@ -1,7 +1,8 @@
-import { AppContentItem, Question, SKILLS_DATA, SkillType, Test, TestResult, UserProgress } from "@/types";
+import { AppContentItem, User as DbUser, Question, SKILLS_DATA, SkillType, Test, TestResult, UserProgress } from "@/types";
 import {
     addDoc,
     collection,
+    deleteDoc,
     doc,
     limit,
     onSnapshot,
@@ -200,4 +201,39 @@ export function subscribeToUser(uid: string, callback: (user: unknown) => void) 
             callback(null);
         }
     });
+}
+/**
+ * Listen to all users (Admin only)
+ */
+export function subscribeToAllUsers(callback: (users: DbUser[]) => void) {
+    const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
+    return onSnapshot(q, (snapshot) => {
+        const users: DbUser[] = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            users.push({
+                ...data,
+                uid: doc.id,
+                createdAt: data.createdAt?.toDate(),
+                lastLogin: data.lastLogin?.toDate(),
+            } as DbUser);
+        });
+        callback(users);
+    });
+}
+
+/**
+ * Update user information (Admin only)
+ */
+export async function updateUser(uid: string, data: Partial<DbUser>) {
+    const userRef = doc(db, "users", uid);
+    await updateDoc(userRef, data as Record<string, unknown>);
+}
+
+/**
+ * Delete a user (Admin only)
+ */
+export async function deleteUser(uid: string) {
+    const userRef = doc(db, "users", uid);
+    await deleteDoc(userRef);
 }

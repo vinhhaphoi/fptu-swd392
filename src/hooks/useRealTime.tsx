@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  subscribeToAllUsers,
   subscribeToFeatures,
   subscribeToQuestions,
   subscribeToSkills,
@@ -16,6 +17,7 @@ import {
   SkillType,
   Test,
   TestResult,
+  User,
   UserProgress,
 } from "@/types";
 import { useEffect, useState } from "react";
@@ -117,4 +119,19 @@ export function useAllUserResults(userId: string | null) {
   }, [userId]);
 
   return { results, loading };
+}
+
+export function useUsers() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsub = subscribeToAllUsers((data) => {
+      setUsers(data);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  return { users, loading };
 }

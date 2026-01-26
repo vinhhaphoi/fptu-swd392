@@ -4,8 +4,7 @@ import Button from "@/components/ui/Button";
 import { useAppContent } from "@/hooks/useRealTime";
 import { updateStats } from "@/lib/db";
 import { AppContentItem } from "@/types";
-import { BarChart3, Edit2, Home, Layout, Save } from "lucide-react";
-import Link from "next/link";
+import { Edit2, Save } from "lucide-react";
 import { useState } from "react";
 
 export default function AdminStatsPage() {
@@ -30,138 +29,97 @@ export default function AdminStatsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex">
-        <aside className="hidden lg:flex flex-col w-64 h-screen sticky top-0 bg-card border-r border-card-border p-6">
-          <div className="flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20">
-              A
-            </div>
-            <span className="font-bold text-xl text-foreground">
-              Admin Panel
-            </span>
-          </div>
+    <div className="p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Manage Statistics
+          </h1>
+          <p className="text-foreground/50">
+            Update the impact numbers shown in the hero section.
+          </p>
+        </div>
 
-          <nav className="flex-1 space-y-2">
-            <Link
-              href="/admin/features"
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground/60 hover:bg-foreground/5 transition-all"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {stats.map((stat, index) => (
+            <div
+              key={index}
+              className="bg-card border border-card-border rounded-2xl p-6 hover:shadow-lg transition-all"
             >
-              <Layout size={20} />
-              Features
-            </Link>
-            <Link
-              href="/admin/stats"
-              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-500/10 text-indigo-500 font-medium"
-            >
-              <BarChart3 size={20} />
-              Statistics
-            </Link>
-            <div className="pt-4 mt-4 border-t border-card-border">
-              <Link
-                href="/"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-foreground/60 hover:bg-foreground/5 transition-all"
-              >
-                <Home size={20} />
-                View Site
-              </Link>
-            </div>
-          </nav>
-        </aside>
-
-        <main className="flex-1 p-6 lg:p-10">
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                Manage Statistics
-              </h1>
-              <p className="text-foreground/50">
-                Update the impact numbers shown in the hero section.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  className="bg-card border border-card-border rounded-2xl p-6 hover:shadow-lg transition-all"
-                >
-                  {isEditing === index ? (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-foreground/60 mb-1">
-                            Value
-                          </label>
-                          <input
-                            type="text"
-                            value={editForm?.value}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm!,
-                                value: e.target.value,
-                              })
-                            }
-                            className="w-full px-4 py-2 rounded-xl bg-background border border-card-border focus:border-indigo-500 outline-none transition-all"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-foreground/60 mb-1">
-                            Label
-                          </label>
-                          <input
-                            type="text"
-                            value={editForm?.label}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm!,
-                                label: e.target.value,
-                              })
-                            }
-                            className="w-full px-4 py-2 rounded-xl bg-background border border-card-border focus:border-indigo-500 outline-none transition-all"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex justify-end gap-3 pt-2">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => setIsEditing(null)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button size="sm" onClick={() => handleSaveEdit(index)}>
-                          <Save size={16} className="mr-2" />
-                          Save
-                        </Button>
-                      </div>
+              {isEditing === index ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground/60 mb-1">
+                        Value
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm?.value}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm!,
+                            value: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 rounded-xl bg-background border border-card-border focus:border-indigo-500 outline-none transition-all"
+                      />
                     </div>
-                  ) : (
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-3xl font-bold bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent mb-1">
-                          {stat.value}
-                        </div>
-                        <div className="text-foreground/50 font-medium">
-                          {stat.label}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setIsEditing(index);
-                          setEditForm(stat);
-                        }}
-                        className="p-3 rounded-xl bg-foreground/5 hover:bg-indigo-500/10 text-foreground/40 hover:text-indigo-500 transition-all"
-                      >
-                        <Edit2 size={20} />
-                      </button>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground/60 mb-1">
+                        Label
+                      </label>
+                      <input
+                        type="text"
+                        value={editForm?.label}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm!,
+                            label: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-2 rounded-xl bg-background border border-card-border focus:border-indigo-500 outline-none transition-all"
+                      />
                     </div>
-                  )}
+                  </div>
+                  <div className="flex justify-end gap-3 pt-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setIsEditing(null)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button size="sm" onClick={() => handleSaveEdit(index)}>
+                      <Save size={16} className="mr-2" />
+                      Save
+                    </Button>
+                  </div>
                 </div>
-              ))}
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-3xl font-bold bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent mb-1">
+                      {stat.value}
+                    </div>
+                    <div className="text-foreground/50 font-medium">
+                      {stat.label}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsEditing(index);
+                      setEditForm(stat);
+                    }}
+                    className="p-3 rounded-xl bg-foreground/5 hover:bg-indigo-500/10 text-foreground/40 hover:text-indigo-500 transition-all"
+                  >
+                    <Edit2 size={20} />
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-        </main>
+          ))}
+        </div>
       </div>
     </div>
   );
