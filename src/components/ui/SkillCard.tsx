@@ -16,7 +16,7 @@ export default function SkillCard({
 
   return (
     <Link href={`/practice/${skill}`}>
-      <div className="group relative overflow-hidden bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:border-indigo-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-indigo-500/10">
+      <div className="group relative overflow-hidden bg-card backdrop-blur-sm border border-card-border rounded-2xl p-6 hover:border-indigo-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-indigo-500/10">
         {/* Background gradient */}
         <div
           className={`absolute inset-0 bg-gradient-to-br ${data.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
@@ -30,11 +30,11 @@ export default function SkillCard({
         </div>
 
         {/* Content */}
-        <h3 className="text-xl font-bold text-white mb-2">{data.name}</h3>
-        <p className="text-slate-400 text-sm mb-4">{data.description}</p>
+        <h3 className="text-xl font-bold text-foreground mb-2">{data.name}</h3>
+        <p className="text-foreground/60 text-sm mb-4">{data.description}</p>
 
         {/* Stats */}
-        <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
+        <div className="flex items-center gap-4 text-sm text-foreground/40 mb-4">
           <span className="flex items-center gap-1">
             <svg
               className="w-4 h-4"
@@ -72,26 +72,26 @@ export default function SkillCard({
         {/* Progress bar */}
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-slate-400">Progress</span>
-            <span className="text-indigo-400">{progress}%</span>
+            <span className="text-foreground/50">Progress</span>
+            <span className="text-indigo-500 font-medium">{progress}%</span>
           </div>
-          <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+          <div className="h-2 bg-foreground/10 rounded-full overflow-hidden">
             <div
               className={`h-full bg-gradient-to-r ${data.color} transition-all duration-500`}
               style={{ width: `${progress}%` }}
             />
           </div>
           {testsCompleted > 0 && (
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-foreground/40">
               {testsCompleted} tests completed
             </p>
           )}
         </div>
 
         {/* Arrow */}
-        <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-slate-700/50 flex items-center justify-center group-hover:bg-indigo-500 transition-all duration-300">
+        <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center group-hover:bg-indigo-500 transition-all duration-300">
           <svg
-            className="w-5 h-5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all"
+            className="w-5 h-5 text-foreground/40 group-hover:text-white group-hover:translate-x-0.5 transition-all"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

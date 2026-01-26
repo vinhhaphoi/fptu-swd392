@@ -11,7 +11,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="space-y-2">
         {label && (
-          <label className="block text-sm font-medium text-slate-300">
+          <label className="block text-sm font-medium text-foreground/80">
             {label}
           </label>
         )}
@@ -19,8 +19,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           className={`
             w-full px-4 py-3 rounded-xl
-            bg-slate-800/50 border border-slate-700
-            text-white placeholder-slate-500
+            bg-card border border-card-border
+            text-foreground placeholder-foreground/30
             focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500
             transition-all duration-200
             ${error ? "border-red-500 focus:ring-red-500/50 focus:border-red-500" : ""}
@@ -28,9 +28,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           `}
           {...props}
         />
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="text-sm text-red-500">{error}</p>}
         {helperText && !error && (
-          <p className="text-sm text-slate-500">{helperText}</p>
+          <p className="text-sm text-foreground/40">{helperText}</p>
         )}
       </div>
     );

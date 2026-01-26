@@ -31,7 +31,7 @@ export default function Card({
   return (
     <div
       className={`
-        bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl
+        bg-card backdrop-blur-sm border border-card-border rounded-2xl
         transition-all duration-300
         ${paddingStyles[padding]}
         ${hoverStyles}

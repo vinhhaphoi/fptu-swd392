@@ -7,7 +7,9 @@ import {
   signInWithGoogle,
   signUp,
 } from "@/lib/auth";
-import { User } from "firebase/auth";
+import { subscribeToUser } from "@/lib/db";
+import { User as DbUser } from "@/types";
+import { User as FirebaseUser } from "firebase/auth";
 import {
   createContext,
   ReactNode,
@@ -17,40 +19,57 @@ import {
 } from "react";
 
 interface AuthContextType {
-  user: User | null;
+  user: FirebaseUser | null;
+  userData: DbUser | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<User>;
+  signIn: (email: string, password: string) => Promise<FirebaseUser>;
   signUp: (
     email: string,
     password: string,
     displayName: string,
-  ) => Promise<User>;
-  signInWithGoogle: () => Promise<User>;
+  ) => Promise<FirebaseUser>;
+  signInWithGoogle: () => Promise<FirebaseUser>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [userData, setUserData] = useState<DbUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthChange((user) => {
       setUser(user);
-      setLoading(false);
+      if (!user) {
+        setUserData(null);
+        setLoading(false);
+      }
     });
 
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (user?.uid) {
+      const unsubscribe = subscribeToUser(user.uid, (data) => {
+        setUserData(data as DbUser);
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    }
+  }, [user]);
+
   const handleSignOut = async () => {
     await authSignOut();
     setUser(null);
+    setUserData(null);
   };
 
   const value: AuthContextType = {
     user,
+    userData,
     loading,
     signIn,
     signUp,

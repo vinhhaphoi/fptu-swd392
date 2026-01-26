@@ -4,17 +4,42 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { useAuth } from "@/hooks/useAuth";
 import { LEVELS, SKILLS_DATA, SkillType } from "@/types";
+import {
+  Award,
+  BookOpen,
+  Calendar,
+  Camera,
+  Flame,
+  LogOut,
+  Target,
+} from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProfilePage() {
-  const { user, loading, signOut } = useAuth();
+  const { user, userData, loading, signOut } = useAuth();
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     displayName: "",
-    targetLevel: "B2",
+    targetLevel: "B1" as "B1" | "B2" | "C1",
   });
+  const [hasSync, setHasSync] = useState(false);
+
+  useEffect(() => {
+    if (userData && !hasSync) {
+      // Use setTimeout to avoid cascading render warning in React 19
+      const timer = setTimeout(() => {
+        setFormData({
+          displayName: userData.displayName || "",
+          targetLevel: (userData.targetLevel as "B1" | "B2" | "C1") || "B1",
+        });
+        setHasSync(true);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [userData, hasSync]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -23,7 +48,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
     );
@@ -34,14 +59,38 @@ export default function ProfilePage() {
     return null;
   }
 
-  // Mock data for demonstration
+  // Safe date formatter
+  const formatDate = (date: unknown) => {
+    if (!date) return "January 2026";
+    try {
+      if (date instanceof Date) {
+        return date.toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        });
+      }
+      if (typeof date === "object" && date !== null && "seconds" in date) {
+        return new Date(
+          (date as { seconds: number }).seconds * 1000,
+        ).toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        });
+      }
+      return "January 2026";
+    } catch {
+      return "January 2026";
+    }
+  };
+
+  // Mock data for demonstration - in real app, these would come from userData or separate stats collection
   const stats = {
     testsCompleted: 15,
     studyTime: "12h 30m",
     currentStreak: 7,
     longestStreak: 14,
-    joinDate: "January 2026",
-    level: "B2",
+    joinDate: formatDate(userData?.createdAt),
+    level: userData?.targetLevel || "B2",
   };
 
   const achievements = [
@@ -72,72 +121,72 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen py-12">
+    <div className="min-h-screen py-12 bg-background">
       <div className="max-w-4xl mx-auto px-4">
         {/* Profile Header */}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8 mb-8">
-          <div className="flex flex-col md:flex-row items-center gap-6">
+        <div className="bg-card/50 backdrop-blur-xl border border-card-border rounded-[32px] p-8 mb-8 shadow-xl shadow-indigo-500/5">
+          <div className="flex flex-col md:flex-row items-center gap-8">
             {/* Avatar */}
-            <div className="relative">
-              <img
-                src={
-                  user.photoURL ||
-                  `https://ui-avatars.com/api/?name=${user.displayName || "User"}&background=6366f1&color=fff&size=128`
-                }
-                alt="Profile"
-                className="w-24 h-24 rounded-2xl object-cover"
-              />
-              <button className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white hover:bg-indigo-600 transition-colors">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+            <div className="relative group">
+              <div className="w-28 h-28 rounded-3xl overflow-hidden border-4 border-background shadow-2xl bg-indigo-500/10 flex items-center justify-center">
+                {userData?.photoURL || user.photoURL ? (
+                  <Image
+                    src={userData?.photoURL || user.photoURL!}
+                    alt="Profile"
+                    width={112}
+                    height={112}
+                    className="object-cover transition-transform group-hover:scale-110 duration-500"
                   />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-4xl font-bold">
+                    {userData?.displayName?.[0] || user.displayName?.[0] || "V"}
+                  </div>
+                )}
+              </div>
+              <button className="absolute -bottom-2 -right-2 w-10 h-10 rounded-2xl bg-indigo-500 text-white flex items-center justify-center shadow-lg hover:bg-indigo-600 hover:scale-110 transition-all duration-300">
+                <Camera size={18} />
               </button>
             </div>
 
             {/* Info */}
             <div className="flex-1 text-center md:text-left">
-              <h1 className="text-2xl font-bold text-white mb-1">
-                {user.displayName || "VSTEP Learner"}
+              <h1 className="text-3xl font-bold text-foreground mb-1">
+                {userData?.displayName || user.displayName || "VSTEP Learner"}
               </h1>
-              <p className="text-slate-400 mb-4">{user.email}</p>
+              <p className="text-foreground/40 mb-6 font-medium">
+                {userData?.email || user.email}
+              </p>
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                <span className="px-3 py-1 rounded-lg bg-indigo-500/20 text-indigo-400 text-sm font-medium">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 text-indigo-500 text-xs font-bold uppercase tracking-wider">
+                  <Target size={14} />
                   Level {stats.level}
-                </span>
-                <span className="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 text-sm font-medium">
-                  🔥 {stats.currentStreak} day streak
-                </span>
-                <span className="text-slate-500 text-sm">
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-500 text-xs font-bold uppercase tracking-wider">
+                  <Flame size={14} />
+                  {stats.currentStreak} day streak
+                </div>
+                <div className="flex items-center gap-1.5 text-foreground/30 text-xs font-medium ml-1">
+                  <Calendar size={14} />
                   Member since {stats.joinDate}
-                </span>
+                </div>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 variant="secondary"
                 onClick={() => setIsEditing(!isEditing)}
+                className="rounded-2xl px-6"
               >
                 Edit Profile
               </Button>
-              <Button variant="ghost" onClick={handleSignOut}>
+              <Button
+                variant="ghost"
+                onClick={handleSignOut}
+                className="rounded-2xl px-6 text-foreground/40 hover:text-red-500 hover:bg-red-500/5"
+              >
+                <LogOut size={18} className="mr-2" />
                 Sign Out
               </Button>
             </div>
@@ -146,41 +195,55 @@ export default function ProfilePage() {
 
         {/* Edit Profile Form */}
         {isEditing && (
-          <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 mb-8">
-            <h2 className="text-lg font-semibold text-white mb-4">
-              Edit Profile
+          <div className="bg-card border border-card-border rounded-[32px] p-8 mb-8 animate-in slide-in-from-top-4 duration-300">
+            <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+              Edit Profile Information
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
-                label="Display Name"
-                placeholder="Enter your name"
-                value={formData.displayName || user.displayName || ""}
+                label="Full Name"
+                placeholder="How should we call you?"
+                value={formData.displayName}
                 onChange={(e) =>
                   setFormData({ ...formData, displayName: e.target.value })
                 }
+                className="rounded-2xl"
               />
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-300">
-                  Target Level
+              <div className="space-y-2 text-left">
+                <label className="text-xs font-semibold text-foreground/40 uppercase tracking-widest ml-1">
+                  Target Proficiency Level
                 </label>
                 <select
                   value={formData.targetLevel}
                   onChange={(e) =>
-                    setFormData({ ...formData, targetLevel: e.target.value })
+                    setFormData({
+                      ...formData,
+                      targetLevel: e.target.value as "B1" | "B2" | "C1",
+                    })
                   }
-                  className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500"
+                  className="w-full px-4 py-4 rounded-2xl bg-background border border-card-border text-foreground focus:outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all font-medium"
                 >
                   {LEVELS.map((level) => (
                     <option key={level} value={level}>
-                      {level}
+                      VSTEP Level {level}
                     </option>
                   ))}
                 </select>
               </div>
             </div>
-            <div className="flex gap-3 mt-4">
-              <Button onClick={() => setIsEditing(false)}>Save Changes</Button>
-              <Button variant="ghost" onClick={() => setIsEditing(false)}>
+            <div className="flex gap-4 mt-8">
+              <Button
+                onClick={() => setIsEditing(false)}
+                className="rounded-2xl px-8"
+              >
+                Save Changes
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setIsEditing(false)}
+                className="rounded-2xl px-8"
+              >
                 Cancel
               </Button>
             </div>
@@ -188,63 +251,74 @@ export default function ProfilePage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-center">
-            <div className="text-3xl font-bold text-white mb-1">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8 text-left">
+          <div className="bg-card border border-card-border rounded-3xl p-6 transition-all hover:border-indigo-500/30 group">
+            <div className="text-4xl font-black text-foreground mb-1 group-hover:scale-110 transition-transform origin-left">
               {stats.testsCompleted}
             </div>
-            <div className="text-slate-400 text-sm">Tests Completed</div>
+            <div className="text-foreground/40 text-xs font-bold uppercase tracking-widest">
+              Tests Completed
+            </div>
           </div>
-          <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-center">
-            <div className="text-3xl font-bold text-indigo-400 mb-1">
+          <div className="bg-card border border-card-border rounded-3xl p-6 transition-all hover:border-indigo-500/30 group">
+            <div className="text-4xl font-black text-indigo-500 mb-1 group-hover:scale-110 transition-transform origin-left">
               {stats.studyTime}
             </div>
-            <div className="text-slate-400 text-sm">Study Time</div>
+            <div className="text-foreground/40 text-xs font-bold uppercase tracking-widest">
+              Study Time
+            </div>
           </div>
-          <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-center">
-            <div className="text-3xl font-bold text-emerald-400 mb-1">
+          <div className="bg-card border border-card-border rounded-3xl p-6 transition-all hover:border-indigo-500/30 group">
+            <div className="text-4xl font-black text-emerald-500 mb-1 group-hover:scale-110 transition-transform origin-left">
               {stats.currentStreak}
             </div>
-            <div className="text-slate-400 text-sm">Current Streak</div>
+            <div className="text-foreground/40 text-xs font-bold uppercase tracking-widest">
+              Current Streak
+            </div>
           </div>
-          <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-center">
-            <div className="text-3xl font-bold text-amber-400 mb-1">
+          <div className="bg-card border border-card-border rounded-3xl p-6 transition-all hover:border-indigo-500/30 group">
+            <div className="text-4xl font-black text-amber-500 mb-1 group-hover:scale-110 transition-transform origin-left">
               {stats.longestStreak}
             </div>
-            <div className="text-slate-400 text-sm">Longest Streak</div>
+            <div className="text-foreground/40 text-xs font-bold uppercase tracking-widest">
+              Longest Streak
+            </div>
           </div>
         </div>
 
         {/* Skill Progress */}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 mb-8">
-          <h2 className="text-lg font-semibold text-white mb-4">
-            Skill Progress
+        <div className="bg-card border border-card-border rounded-[32px] p-8 mb-8 text-left">
+          <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+            <BookOpen size={20} className="text-indigo-500" />
+            Learning Progress
           </h2>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {(Object.keys(SKILLS_DATA) as SkillType[]).map((skill) => {
               const data = SKILLS_DATA[skill];
-              const progress = Math.floor(Math.random() * 40 + 40); // Demo random progress
+              const progress = 65; // Fixed value for now to avoid purity error
 
               return (
-                <div key={skill} className="flex items-center gap-4">
-                  <div
-                    className={`w-10 h-10 rounded-lg bg-gradient-to-br ${data.color} flex items-center justify-center text-xl shrink-0`}
-                  >
-                    {data.icon}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between mb-1">
-                      <span className="font-medium text-white">
+                <div key={skill} className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-10 h-10 rounded-xl bg-gradient-to-br ${data.color} flex items-center justify-center text-xl shadow-lg shadow-indigo-500/10`}
+                      >
+                        {data.icon}
+                      </div>
+                      <span className="font-bold text-foreground">
                         {data.name}
                       </span>
-                      <span className="text-slate-400">{progress}%</span>
                     </div>
-                    <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full bg-gradient-to-r ${data.color}`}
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
+                    <span className="text-sm font-black text-foreground/40">
+                      {progress}%
+                    </span>
+                  </div>
+                  <div className="h-2.5 bg-foreground/5 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full bg-gradient-to-r ${data.color} transition-all duration-1000`}
+                      style={{ width: `${progress}%` }}
+                    />
                   </div>
                 </div>
               );
@@ -253,47 +327,52 @@ export default function ProfilePage() {
         </div>
 
         {/* Achievements */}
-        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">
-            Achievements
+        <div className="bg-card border border-card-border rounded-[32px] p-8 text-left">
+          <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+            <Award size={20} className="text-amber-500" />
+            Milestones & Badges
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {achievements.map((achievement, index) => (
               <div
                 key={index}
-                className={`flex items-center gap-4 p-4 rounded-xl ${
+                className={`flex items-center gap-5 p-5 rounded-2xl border transition-all ${
                   achievement.earned
-                    ? "bg-slate-900/50"
-                    : "bg-slate-900/30 opacity-50"
+                    ? "bg-foreground/[0.02] border-indigo-500/10"
+                    : "bg-transparent border-card-border opacity-40 grayscale"
                 }`}
               >
                 <div
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${
-                    achievement.earned ? "bg-indigo-500/20" : "bg-slate-800"
+                  className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0 ${
+                    achievement.earned
+                      ? "bg-indigo-500/10 shadow-inner"
+                      : "bg-foreground/5"
                   }`}
                 >
                   {achievement.icon}
                 </div>
-                <div>
-                  <h3 className="font-medium text-white">
+                <div className="flex-1">
+                  <h3 className="font-bold text-foreground leading-tight">
                     {achievement.title}
                   </h3>
-                  <p className="text-sm text-slate-400">
+                  <p className="text-xs text-foreground/40 font-medium mt-1">
                     {achievement.description}
                   </p>
                 </div>
                 {achievement.earned && (
-                  <svg
-                    className="w-6 h-6 text-emerald-400 ml-auto"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                    <svg
+                      className="w-4 h-4 text-emerald-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
                 )}
               </div>
             ))}

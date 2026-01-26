@@ -1,15 +1,24 @@
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 
 export default function Header() {
-  const { user, signOut, loading } = useAuth();
+  const { user, userData, signOut, loading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const handleSignOut = async () => {
     await signOut();
@@ -24,7 +33,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-card-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -33,7 +42,7 @@ export default function Header() {
               <span className="text-white font-bold text-lg">V</span>
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-              VSTEP Master
+              Vinhhaphoi
             </span>
           </Link>
 
@@ -43,55 +52,79 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-all duration-200"
+                className="px-4 py-2 rounded-lg text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-all duration-200"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          {/* Auth Buttons */}
+          {/* Actions */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-lg hover:bg-foreground/5 transition-colors text-foreground/70 hover:text-foreground"
+              aria-label="Toggle theme"
+            >
+              {mounted &&
+                (theme === "dark" ? <Sun size={20} /> : <Moon size={20} />)}
+            </button>
+
             {loading ? (
               <div className="w-8 h-8 rounded-full bg-slate-700 animate-pulse" />
             ) : user ? (
               <div className="relative">
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 transition-all"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/5 hover:bg-foreground/10 transition-all border border-card-border"
                 >
-                  <img
-                    src={
-                      user.photoURL ||
-                      `https://ui-avatars.com/api/?name=${user.displayName || "User"}&background=6366f1&color=fff`
-                    }
-                    alt="Profile"
-                    className="w-8 h-8 rounded-full"
-                  />
-                  <span className="text-sm text-slate-300">
-                    {user.displayName || "User"}
+                  <div className="relative w-8 h-8 rounded-full overflow-hidden border border-indigo-500/20 bg-indigo-500/10 flex items-center justify-center">
+                    {userData?.photoURL || user.photoURL ? (
+                      <Image
+                        src={userData?.photoURL || user.photoURL!}
+                        alt="Profile"
+                        width={32}
+                        height={32}
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 font-bold text-white text-[10px]">
+                        V
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-sm text-foreground/80">
+                    {userData?.displayName || user.displayName || "User"}
                   </span>
                 </button>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-slate-800 rounded-xl shadow-xl border border-slate-700 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-48 bg-card rounded-xl shadow-xl border border-card-border overflow-hidden">
                     <Link
                       href="/profile"
-                      className="block px-4 py-3 text-slate-300 hover:bg-white/5 transition-all"
+                      className="block px-4 py-3 text-foreground/70 hover:bg-foreground/5 transition-all"
                       onClick={() => setIsProfileOpen(false)}
                     >
                       Profile
                     </Link>
                     <Link
                       href="/results"
-                      className="block px-4 py-3 text-slate-300 hover:bg-white/5 transition-all"
+                      className="block px-4 py-3 text-foreground/70 hover:bg-foreground/5 transition-all"
                       onClick={() => setIsProfileOpen(false)}
                     >
                       My Results
                     </Link>
+                    <Link
+                      href="/admin/features"
+                      className="block px-4 py-3 text-indigo-500 hover:bg-indigo-500/5 transition-all border-t border-card-border"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      Admin Panel
+                    </Link>
                     <button
                       onClick={handleSignOut}
-                      className="w-full text-left px-4 py-3 text-red-400 hover:bg-white/5 transition-all border-t border-slate-700"
+                      className="w-full text-left px-4 py-3 text-red-500 hover:bg-red-500/5 transition-all border-t border-card-border"
                     >
                       Sign Out
                     </button>
@@ -102,7 +135,7 @@ export default function Header() {
               <>
                 <Link
                   href="/auth/login"
-                  className="px-4 py-2 text-slate-300 hover:text-white transition-colors"
+                  className="px-4 py-2 text-foreground/70 hover:text-foreground transition-colors"
                 >
                   Sign In
                 </Link>
@@ -116,45 +149,54 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-white/5"
-          >
-            <svg
-              className="w-6 h-6 text-slate-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {/* Mobile Actions */}
+          <div className="flex md:hidden items-center gap-2">
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-2 rounded-lg hover:bg-foreground/5 transition-colors text-foreground/70 hover:text-foreground"
             >
-              {isMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
+              {mounted &&
+                (theme === "dark" ? <Sun size={20} /> : <Moon size={20} />)}
+            </button>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-lg hover:bg-foreground/5 text-foreground/70"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                {isMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-slate-700/50">
+          <div className="md:hidden py-4 border-t border-card-border">
             <nav className="flex flex-col gap-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5"
+                  className="px-4 py-3 rounded-lg text-foreground/70 hover:text-foreground hover:bg-foreground/5"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
@@ -164,7 +206,7 @@ export default function Header() {
                 <>
                   <Link
                     href="/auth/login"
-                    className="px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5"
+                    className="px-4 py-3 rounded-lg text-foreground/70 hover:text-foreground hover:bg-foreground/5"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign In

@@ -19,18 +19,25 @@ export async function signUp(email: string, password: string, displayName: strin
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Update profile
-    await updateProfile(user, { displayName });
+    // Use a default avatar if none exists
+    const photoURL = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=6366f1&color=fff`;
 
-    // Create user document in Firestore
+    // Update Firebase Auth profile
+    await updateProfile(user, {
+        displayName,
+        photoURL
+    });
+
+    // Create/Update user document in Firestore
     await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         email: user.email,
         displayName: displayName,
-        photoURL: user.photoURL,
+        photoURL: photoURL,
+        lastLogin: serverTimestamp(),
         createdAt: serverTimestamp(),
         targetLevel: "B2",
-    });
+    }, { merge: true });
 
     return user;
 }
@@ -38,6 +45,12 @@ export async function signUp(email: string, password: string, displayName: strin
 // Sign in with email and password
 export async function signIn(email: string, password: string) {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+    // Update last login
+    await setDoc(doc(db, "users", userCredential.user.uid), {
+        lastLogin: serverTimestamp(),
+    }, { merge: true });
+
     return userCredential.user;
 }
 
@@ -46,19 +59,24 @@ export async function signInWithGoogle() {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
-    // Check if user document exists
-    const userDoc = await getDoc(doc(db, "users", user.uid));
+    // Always update Firestore with latest info from Google
+    await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        lastLogin: serverTimestamp(),
+        // Only set createdAt if it doesn't exist
+        updatedAt: serverTimestamp(),
+    }, { merge: true });
 
-    if (!userDoc.exists()) {
-        // Create user document in Firestore
+    // Ensure createdAt exists
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    if (!userDoc.data()?.createdAt) {
         await setDoc(doc(db, "users", user.uid), {
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
             createdAt: serverTimestamp(),
             targetLevel: "B2",
-        });
+        }, { merge: true });
     }
 
     return user;

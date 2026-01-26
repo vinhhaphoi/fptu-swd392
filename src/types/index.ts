@@ -8,6 +8,14 @@ export interface User {
     createdAt?: Date;
 }
 
+export interface AppContentItem {
+    value?: string;
+    label?: string;
+    icon?: string;
+    title?: string;
+    description?: string;
+}
+
 // Test types
 export interface Test {
     id: string;
