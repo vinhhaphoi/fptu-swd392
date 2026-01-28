@@ -6,7 +6,7 @@ namespace Application.Services;
 
 public class HintService : IHintService
 {
-    private readonly IHintRepository _hintRepository;
+    private readonly IHintRepository _hintRepository;   
 
     public HintService(IHintRepository hintRepository)
     {
