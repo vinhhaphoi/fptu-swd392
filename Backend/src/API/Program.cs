@@ -109,6 +109,10 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ILearningService, LearningService>();
+builder.Services.AddScoped<IHintService, HintService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IAIEvaluationService, AIEvaluationService>();
 
 // Dependency Injection - Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);
