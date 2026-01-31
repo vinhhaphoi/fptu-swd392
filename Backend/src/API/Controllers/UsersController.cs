@@ -7,8 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers;
 
 /// <summary>
-/// Controller for user profile management (authenticated users only)
+/// 👤 User Profile Management APIs
 /// </summary>
+/// <remarks>
+/// APIs for managing authenticated user's profile, settings, and personal data.
+/// All endpoints require valid JWT authentication.
+/// </remarks>
 [ApiController]
 [Route("api/user")]
 [Authorize]
@@ -29,8 +33,25 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Get current user profile
+    /// 📋 Get current user profile
     /// </summary>
+    /// <remarks>
+    /// Retrieve complete profile information for the authenticated user.
+    /// Includes user details, role, and account status.
+    /// 
+    /// Example response:
+    /// {
+    ///   "id": 123,
+    ///   "name": "John Smith",
+    ///   "username": "john_smith",
+    ///   "email": "john@example.com",
+    ///   "role": "User",
+    ///   "targetLevelId": 2,
+    ///   "createdAt": "2026-01-31T10:00:00Z",
+    ///   "updatedAt": "2026-01-31T11:00:00Z",
+    ///   "isActive": true
+    /// }
+    /// </remarks>
     /// <returns>User profile information</returns>
     [HttpGet("profile")]
     [ProducesResponseType(typeof(UserProfileResponse), 200)]
@@ -58,8 +79,20 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Update current user profile
+    /// ✏️ Update current user profile
     /// </summary>
+    /// <remarks>
+    /// Update profile information for the currently authenticated user.
+    /// Email must be unique across the system.
+    /// 
+    /// Example request:
+    /// PUT /api/user/profile
+    /// {
+    ///   "name": "John Smith Updated",
+    ///   "email": "john.updated@example.com",
+    ///   "phoneNumber": "+1987654321"
+    /// }
+    /// </remarks>
     /// <param name="request">Profile update request</param>
     /// <returns>Updated profile information</returns>
     [HttpPut("profile")]
@@ -122,8 +155,19 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Change current user password
+    /// 🔐 Change current user password
     /// </summary>
+    /// <remarks>
+    /// Change password for the currently authenticated user.
+    /// Requires current password for verification.
+    /// 
+    /// Example request:
+    /// POST /api/user/change-password
+    /// {
+    ///   "currentPassword": "OldPassword123!",
+    ///   "newPassword": "NewPassword456!"
+    /// }
+    /// </remarks>
     /// <param name="request">Password change request</param>
     /// <returns>Success message</returns>
     [HttpPost("change-password")]
