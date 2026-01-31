@@ -27,8 +27,20 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// User login endpoint
+    /// 🔐 Authenticate user and receive JWT token
     /// </summary>
+    /// <remarks>
+    /// Use this endpoint to login with username and password.
+    /// Returns a JWT token that must be included in the Authorization header for subsequent requests.
+    /// Token expires after 2 hours.
+    /// 
+    /// Example request:
+    /// POST /api/auth/login
+    /// {
+    ///   "username": "john_doe",
+    ///   "password": "SecurePass123!"
+    /// }
+    /// </remarks>
     [HttpPost("login")]
     [ProducesResponseType(typeof(AuthResponse), 200)]
     [ProducesResponseType(typeof(object), 400)]
@@ -53,12 +65,23 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// User registration endpoint with comprehensive validation
+    /// 📝 Register a new user account
     /// </summary>
     /// <remarks>
-    /// All new registrations are automatically assigned the "User" role.
-    /// Only administrators can change user roles through admin endpoints.
+    /// Creates a new user account with "User" role by default.
+    /// All fields are required except phoneNumber.
+    /// Username and email must be unique.
     /// 
+    /// Example request:
+    /// POST /api/auth/register
+    /// {
+    ///   "name": "John Smith",
+    ///   "username": "john_smith",
+    ///   "email": "john@example.com",
+    ///   "phoneNumber": "+1234567890",
+    ///   "password": "SecurePass123!"
+    /// }
+    /// </remarks>
     /// Validation Rules:
     /// - Name: 2-100 characters, letters only
     /// - Username: 3-50 characters, alphanumeric with _ and -, must be unique
@@ -124,6 +147,13 @@ public class AuthController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// 🔓 Logout current user session
+    /// </summary>
+    /// <remarks>
+    /// Since JWT is stateless, logout is handled client-side by removing the token.
+    /// This endpoint confirms successful logout and provides client-side instructions.
+    /// </remarks>
     [HttpPost("logout")]
     [Microsoft.AspNetCore.Authorization.Authorize]
     public IActionResult Logout()
@@ -133,6 +163,21 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Logged out successfully. Please remove the token from client storage." });
     }
 
+    /// <summary>
+    /// ✅ Validate JWT token authenticity
+    /// </summary>
+    /// <remarks>
+    /// Validates the provided JWT token and returns user information if valid.
+    /// Use this to check if a stored token is still valid before making other API calls.
+    /// 
+    /// Example response:
+    /// {
+    ///   "isValid": true,
+    ///   "userId": 123,
+    ///   "username": "john_doe",
+    ///   "role": "User"
+    /// }
+    /// </remarks>
     [HttpPost("validate")]
     [Microsoft.AspNetCore.Authorization.Authorize]
     public async Task<IActionResult> ValidateToken()
@@ -142,7 +187,20 @@ public class AuthController : ControllerBase
         return Ok(new { isValid });
     }
 
-    /// <summary>Request password reset. Token is sent by email in production; for testing check DB password_reset_tokens.</summary>
+    /// <summary>
+    /// 🔑 Request password reset email
+    /// </summary>
+    /// <remarks>
+    /// Sends a password reset email to the specified email address.
+    /// Email must be registered in the system.
+    /// User will receive a reset link with token to change password.
+    /// 
+    /// Example request:
+    /// POST /api/auth/forgot-password
+    /// {
+    ///   "email": "john@example.com"
+    /// }
+    /// </remarks>
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
@@ -150,7 +208,20 @@ public class AuthController : ControllerBase
         return Ok(new { message = "If the email exists, a reset link has been sent." });
     }
 
-    /// <summary>Reset password using token from forgot-password email (or from DB for testing).</summary>
+    /// <summary>
+    /// 🔁 Reset password with token
+    /// </summary>
+    /// <remarks>
+    /// Completes the password reset process using the token received via email.
+    /// Token expires after 1 hour for security.
+    /// 
+    /// Example request:
+    /// POST /api/auth/reset-password
+    /// {
+    ///   "token": "reset_token_from_email",
+    ///   "newPassword": "NewSecurePass456!"
+    /// }
+    /// </remarks>
     [HttpPost("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {

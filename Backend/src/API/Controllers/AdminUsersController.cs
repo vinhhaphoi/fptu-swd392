@@ -6,8 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers;
 
 /// <summary>
-/// Admin-only controller for user management operations
+/// 👮 Admin User Management APIs
 /// </summary>
+/// <remarks>
+/// Admin-only APIs for managing all users in the system.
+/// Requires Admin role with full permissions.
+/// Features include CRUD operations, pagination, search, and sorting.
+/// </remarks>
 [ApiController]
 [Route("api/admin/users")]
 [Authorize(Policy = "AdminOnly")]
@@ -25,8 +30,28 @@ public class AdminUsersController : ControllerBase
     }
 
     /// <summary>
-    /// Get all users with pagination, search, and sorting
+    /// 📋 Get all users with advanced filtering
     /// </summary>
+    /// <remarks>
+    /// Retrieve paginated list of all users with optional search and sorting.
+    /// Supports filtering by name, username, or email.
+    /// 
+    /// Query Parameters:
+    /// - page: Page number (default: 1)
+    /// - pageSize: Items per page (default: 10)
+    /// - search: Search term for name/username/email
+    /// - sortBy: Field to sort by (name, email, createdAt, etc.)
+    /// - sortOrder: asc or desc (default: asc)
+    /// 
+    /// Example response:
+    /// {
+    ///   "items": [...],
+    ///   "totalItems": 25,
+    ///   "currentPage": 1,
+    ///   "totalPages": 3,
+    ///   "pageSize": 10
+    /// }
+    /// </remarks>
     /// <param name="page">Page number (default: 1)</param>
     /// <param name="pageSize">Number of items per page (default: 10, max: 100)</param>
     /// <param name="search">Search term for name, username, or email</param>
@@ -69,8 +94,12 @@ public class AdminUsersController : ControllerBase
     }
 
     /// <summary>
-    /// Get user details by ID
+    /// 🔍 Get user details by ID
     /// </summary>
+    /// <remarks>
+    /// Retrieve detailed information for a specific user by ID.
+    /// Includes complete profile data and account status.
+    /// </remarks>
     /// <param name="id">User ID</param>
     /// <returns>User details</returns>
     [HttpGet("{id:int}")]
@@ -94,8 +123,25 @@ public class AdminUsersController : ControllerBase
     }
 
     /// <summary>
-    /// Create a new user
+    /// ➕ Create a new user account
     /// </summary>
+    /// <remarks>
+    /// Create a new user account with specified role and settings.
+    /// Username and email must be unique across the system.
+    /// 
+    /// Example request:
+    /// POST /api/admin/users
+    /// {
+    ///   "name": "New User",
+    ///   "username": "new_user",
+    ///   "email": "new@example.com",
+    ///   "phoneNumber": "+1234567890",
+    ///   "password": "SecurePass123!",
+    ///   "role": "User",
+    ///   "targetLevelId": 2,
+    ///   "isActive": true
+    /// }
+    /// </remarks>
     /// <param name="request">User creation request</param>
     /// <returns>Created user details</returns>
     [HttpPost]
@@ -133,8 +179,24 @@ public class AdminUsersController : ControllerBase
     }
 
     /// <summary>
-    /// Update user information
+    /// ✏️ Update user information
     /// </summary>
+    /// <remarks>
+    /// Update an existing user's information and settings.
+    /// Cannot change password through this endpoint (use change-password endpoint).
+    /// 
+    /// Example request:
+    /// PUT /api/admin/users/123
+    /// {
+    ///   "name": "Updated Name",
+    ///   "username": "updated_username",
+    ///   "email": "updated@example.com",
+    ///   "phoneNumber": "+1987654321",
+    ///   "role": "Manager",
+    ///   "targetLevelId": 3,
+    ///   "isActive": true
+    /// }
+    /// </remarks>
     /// <param name="id">User ID</param>
     /// <param name="request">Update request</param>
     /// <returns>Updated user details</returns>
@@ -164,8 +226,18 @@ public class AdminUsersController : ControllerBase
     }
 
     /// <summary>
-    /// Update user password
+    /// 🔐 Update user password (admin)
     /// </summary>
+    /// <remarks>
+    /// Reset a user's password as an administrator.
+    /// Does not require knowledge of current password.
+    /// 
+    /// Example request:
+    /// PUT /api/admin/users/123/password
+    /// {
+    ///   "newPassword": "NewSecurePass456!"
+    /// }
+    /// </remarks>
     /// <param name="id">User ID</param>
     /// <param name="request">Password update request</param>
     /// <returns>Success status</returns>
@@ -194,8 +266,14 @@ public class AdminUsersController : ControllerBase
     }
 
     /// <summary>
-    /// Delete a user (cannot delete admin users)
+    /// 🗑️ Delete a user account
     /// </summary>
+    /// <remarks>
+    /// Permanently delete a user account from the system.
+    /// This action cannot be undone.
+    /// All associated data will be removed.
+    /// Cannot delete admin users for security.
+    /// </remarks>
     /// <param name="id">User ID</param>
     /// <returns>Success status</returns>
     [HttpDelete("{id:int}")]
