@@ -7,7 +7,7 @@ namespace Application.DTOs.User;
 /// </summary>
 public class AdminUserResponse
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;

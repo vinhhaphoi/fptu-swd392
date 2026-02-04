@@ -21,7 +21,7 @@ public class DashboardService : IDashboardService
         _topicRepository = topicRepository;
     }
 
-    public async Task<DashboardStatsResponse> GetUserStatsAsync(int userId)
+    public async Task<DashboardStatsResponse> GetUserStatsAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) throw new InvalidOperationException("User not found");

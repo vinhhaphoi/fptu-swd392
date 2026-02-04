@@ -98,11 +98,15 @@ public class AuthController : ControllerBase
     {
         try
         {
+            _logger.LogDebug("Starting registration for username: {Username}, email: {Email}", request.Username, request.Email);
+            
             // Manual validation to support async rules (username/email uniqueness)
             var validationResult = await _registerValidator.ValidateAsync(request);
             
             if (!validationResult.IsValid)
             {
+                _logger.LogWarning("Validation failed for user {Username}: {Errors}", request.Username, string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
+                
                 // Return validation errors in standard format
                 var errors = validationResult.Errors
                     .GroupBy(e => e.PropertyName)
@@ -119,6 +123,8 @@ public class AuthController : ControllerBase
                     errors 
                 });
             }
+            
+            _logger.LogDebug("Validation passed for user {Username}, proceeding with registration", request.Username);
 
             var response = await _authService.RegisterAsync(request);
             
@@ -140,8 +146,8 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             // Unexpected errors
-            _logger.LogError(ex, "Unexpected error during registration. Username: {Username}, Email: {Email}. InnerException: {InnerException}", 
-                request.Username, request.Email, ex.InnerException?.Message);
+            _logger.LogError(ex, "Unexpected error during registration. Username: {Username}, Email: {Email}. Exception: {Exception}", 
+                request.Username, request.Email, ex);
             
             return StatusCode(500, new { message = "An unexpected error occurred during registration. Please try again later." });
         }
@@ -242,7 +248,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
     {
         var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized();
         try
         {
@@ -268,7 +274,26 @@ public class AuthController : ControllerBase
     {
         var innerException = ex.InnerException?.Message ?? ex.Message;
 
-        // MySQL specific error messages
+        // PostgreSQL specific error messages
+        if (innerException.Contains("duplicate key value violates unique constraint", StringComparison.OrdinalIgnoreCase))
+        {
+            if (innerException.Contains("username"))
+                return "Username already exists. Please choose a different username.";
+            if (innerException.Contains("email"))
+                return "Email already exists. Please use a different email address.";
+            if (innerException.Contains("phone_number"))
+                return "Phone number already exists. Please use a different phone number.";
+            if (innerException.Contains("ix_users_email"))
+                return "Email already exists. Please use a different email address.";
+            if (innerException.Contains("ix_users_username"))
+                return "Username already exists. Please choose a different username.";
+            if (innerException.Contains("ix_users_phone_number"))
+                return "Phone number already exists. Please use a different phone number.";
+            
+            return "A record with this information already exists.";
+        }
+
+        // MySQL specific error messages (for backward compatibility)
         if (innerException.Contains("Duplicate entry") || innerException.Contains("UNIQUE"))
         {
             if (innerException.Contains("username"))
@@ -281,19 +306,43 @@ public class AuthController : ControllerBase
             return "A record with this information already exists.";
         }
 
-        if (innerException.Contains("foreign key constraint", StringComparison.OrdinalIgnoreCase))
+        if (innerException.Contains("foreign key constraint", StringComparison.OrdinalIgnoreCase) || 
+            innerException.Contains("violates foreign key constraint", StringComparison.OrdinalIgnoreCase))
         {
             return "Invalid reference data provided. Please check your input.";
         }
 
-        if (innerException.Contains("cannot be null", StringComparison.OrdinalIgnoreCase))
+        if (innerException.Contains("cannot be null", StringComparison.OrdinalIgnoreCase) ||
+            innerException.Contains("null value in column", StringComparison.OrdinalIgnoreCase))
         {
             return "Required field is missing. Please check your input.";
         }
 
-        if (innerException.Contains("Data too long", StringComparison.OrdinalIgnoreCase))
+        if (innerException.Contains("Data too long", StringComparison.OrdinalIgnoreCase) ||
+            innerException.Contains("value too long for type", StringComparison.OrdinalIgnoreCase))
         {
             return "One or more fields exceed the maximum allowed length.";
+        }
+
+        if (innerException.Contains("check constraint", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Input validation failed. Please check your input format.";
+        }
+
+        if (innerException.Contains("invalid input syntax", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Invalid input format. Please check your input.";
+        }
+
+        if (innerException.Contains("does not exist", StringComparison.OrdinalIgnoreCase))
+        {
+            // Check if this is specifically a level reference issue
+            if (innerException.Contains("target_level", StringComparison.OrdinalIgnoreCase) ||
+                innerException.Contains("level", StringComparison.OrdinalIgnoreCase))
+            {
+                return "Required level data is missing from the database. Please contact administrator to ensure reference data is seeded.";
+            }
+            return "Referenced data does not exist.";
         }
 
         // Default error message for production (don't expose internal details)

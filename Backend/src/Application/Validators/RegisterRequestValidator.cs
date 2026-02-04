@@ -81,9 +81,9 @@ public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
         // Vietnamese phone number patterns
         var patterns = new[]
         {
-            @"^0[3|5|7|8|9][0-9]{8}$",           // 10 digits starting with 0 (e.g., 0912345678)
-            @"^\+84[3|5|7|8|9][0-9]{8}$",        // +84 format (e.g., +84912345678)
-            @"^84[3|5|7|8|9][0-9]{8}$"           // 84 format (e.g., 84912345678)
+            @"^0[35789][0-9]{8}$",           // 10 digits starting with 0 (e.g., 0912345678)
+            @"^\+84[35789][0-9]{8}$",        // +84 format (e.g., +84912345678)
+            @"^84[35789][0-9]{8}$"           // 84 format (e.g., 84912345678)
         };
 
         return patterns.Any(pattern => Regex.IsMatch(cleanNumber, pattern));

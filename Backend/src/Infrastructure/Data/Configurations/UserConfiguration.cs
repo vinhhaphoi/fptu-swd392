@@ -8,10 +8,10 @@ namespace Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.ToTable("users");
+            builder.ToTable("profiles");
             
             builder.HasKey(e => e.Id);
-            builder.Property(e => e.Id).HasColumnName("user_id");
+            builder.Property(e => e.Id).HasColumnName("id"); // In Supabase, this is the UUID from auth.users
 
             builder.Property(e => e.Name)
                    .HasColumnName("name")

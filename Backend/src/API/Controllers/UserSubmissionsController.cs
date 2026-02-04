@@ -25,10 +25,10 @@ public class UserSubmissionsController : ControllerBase
         _evaluationService = evaluationService;
     }
 
-    private int? GetCurrentUserId()
+    private Guid? GetCurrentUserId()
     {
         var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        return int.TryParse(claim, out var id) ? id : null;
+        return Guid.TryParse(claim, out var id) ? id : null;
     }
 
     [HttpGet("by-session/{sessionId:int}")]
@@ -37,7 +37,7 @@ public class UserSubmissionsController : ControllerBase
         var session = await _sessionRepo.GetByIdAsync(sessionId);
         if (session == null) return NotFound();
         var userId = GetCurrentUserId();
-        if (userId != session.UserId) return Forbid();
+        if (userId == null || userId != session.UserId) return Forbid();
         return Ok(await _repo.GetBySessionIdAsync(sessionId));
     }
 
@@ -49,7 +49,7 @@ public class UserSubmissionsController : ControllerBase
         var session = await _sessionRepo.GetByIdAsync(item.SessionId);
         if (session == null) return NotFound();
         var userId = GetCurrentUserId();
-        if (userId != session.UserId) return Forbid();
+        if (userId == null || userId != session.UserId) return Forbid();
         return Ok(item);
     }
 
@@ -63,7 +63,7 @@ public class UserSubmissionsController : ControllerBase
         if (session == null) return NotFound();
         
         var userId = GetCurrentUserId();
-        if (userId != session.UserId) return Forbid();
+        if (userId == null || userId != session.UserId) return Forbid();
 
         try 
         {
@@ -82,7 +82,7 @@ public class UserSubmissionsController : ControllerBase
         var session = await _sessionRepo.GetByIdAsync(request.SessionId);
         if (session == null) return NotFound("Session not found");
         var userId = GetCurrentUserId();
-        if (userId != session.UserId) return Forbid();
+        if (userId == null || userId != session.UserId) return Forbid();
         var entity = new UserSubmission
         {
             SessionId = request.SessionId,

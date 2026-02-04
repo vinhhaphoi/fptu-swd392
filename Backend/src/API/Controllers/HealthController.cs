@@ -1,6 +1,7 @@
 using Infrastructure.Data.DbContexts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace API.Controllers;
 
@@ -33,7 +34,7 @@ public class HealthController : ControllerBase
     }
 
     /// <summary>
-    /// Kiểm tra kết nối MySQL: có kết nối được không, thời gian phản hồi, số bản ghi users (nếu có).
+    /// Kiểm tra kết nối PostgreSQL: có kết nối được không, thời gian phản hồi, số bản ghi levels (nếu có).
     /// </summary>
     [HttpGet("health/db")]
     public async Task<IActionResult> CheckDatabase(CancellationToken cancellationToken = default)
@@ -54,15 +55,16 @@ public class HealthController : ControllerBase
                 });
             }
 
-            var userCount = await _db.Users.CountAsync(cancellationToken);
+            // Check if the levels table exists and has data
+            var levelCount = await _db.Levels.CountAsync(cancellationToken);
             sw.Stop();
 
             return Ok(new
             {
                 database = "connected",
-                message = "MySQL connection OK",
+                message = "PostgreSQL connection OK",
                 elapsedMs = sw.ElapsedMilliseconds,
-                userCount,
+                levelCount,
                 timestamp = DateTime.UtcNow
             });
         }
@@ -80,6 +82,72 @@ public class HealthController : ControllerBase
     }
 
     /// <summary>
+    /// Kiểm tra dữ liệu tham chiếu cần cho đăng ký người dùng.
+    /// </summary>
+    [HttpGet("health/refdata")]
+    public async Task<IActionResult> CheckReferenceData(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var levelsCount = await _db.Levels.CountAsync(cancellationToken);
+            var levelExists = await _db.Levels.AnyAsync(cancellationToken);
+            
+            var result = new
+            {
+                levelsCount,
+                hasLevels = levelExists,
+                message = levelExists ? "Reference data exists - registration should work" : "Missing reference data - registration may fail",
+                timestamp = DateTime.UtcNow
+            };
+            
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message = "Error checking reference data",
+                error = ex.Message,
+                timestamp = DateTime.UtcNow
+            });
+        }
+    }
+
+    /// <summary>
+    /// Test kết nối DB trực tiếp bằng Npgsql (như yêu cầu)
+    /// </summary>
+    [HttpGet("health/direct-db-test")]
+    public async Task<IActionResult> DirectDbTest(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var connStr = _db.Database.GetConnectionString();
+            using var conn = new NpgsqlConnection(connStr);
+            await conn.OpenAsync(cancellationToken);
+            
+            // Test a simple query
+            using var cmd = new NpgsqlCommand("SELECT 1", conn);
+            var result = await cmd.ExecuteScalarAsync(cancellationToken);
+            
+            return Ok(new
+            {
+                message = "DB CONNECT OK",
+                result = result?.ToString(),
+                timestamp = DateTime.UtcNow
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message = "DB CONNECT FAILED",
+                error = ex.Message,
+                timestamp = DateTime.UtcNow
+            });
+        }
+    }
+
+    /// <summary>
     /// Thông tin môi trường + DB status (gọn để test nhanh).
     /// </summary>
     [HttpGet("health")]
@@ -90,9 +158,14 @@ public class HealthController : ControllerBase
         {
             dbOk = await _db.Database.CanConnectAsync(cancellationToken);
         }
-        catch
+        catch (Exception ex)
         {
-            // ignore
+            return StatusCode(500, new
+            {
+                status = "error",
+                error = ex.Message,
+                stackTrace = ex.StackTrace
+            });
         }
 
         return Ok(new
@@ -103,4 +176,31 @@ public class HealthController : ControllerBase
             timestamp = DateTime.UtcNow
         });
     }
+
+    /// <summary>
+    /// Simple database connection test
+    /// </summary>
+    [HttpGet("health/simple")]
+    public async Task<IActionResult> SimpleHealth(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var canConnect = await _db.Database.CanConnectAsync(cancellationToken);
+            return Ok(new
+            {
+                database = canConnect ? "connected" : "disconnected",
+                message = canConnect ? "Database connection successful" : "Database connection failed"
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                database = "error",
+                message = ex.Message,
+                stackTrace = ex.StackTrace
+            });
+        }
+    }
+
 }

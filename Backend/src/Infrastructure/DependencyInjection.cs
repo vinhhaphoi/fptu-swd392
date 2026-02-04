@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Interfaces.Repositories;
 using Infrastructure.Repositories;
+using Supabase;
 
 namespace Infrastructure;
 
@@ -13,11 +14,18 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Register DbContext with MySQL
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        // Register Supabase client
+        var supabaseUrl = configuration.GetValue<string>("Supabase:Url");
+        var supabaseKey = configuration.GetValue<string>("Supabase:Key");
+        
+        services.AddSingleton<Client>(_ => new Client(supabaseUrl, supabaseKey));
+        
+
+        
+        // Register DbContext with PostgreSQL for Supabase
+        var connectionString = configuration.GetConnectionString("PoolerConnection");
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseMySql(connectionString, 
-                ServerVersion.AutoDetect(connectionString)));
+            options.UseNpgsql(connectionString));
 
         // Register repositories
         services.AddScoped<IUserRepository, UserRepository>();

@@ -102,10 +102,10 @@ public class AdminUsersController : ControllerBase
     /// </remarks>
     /// <param name="id">User ID</param>
     /// <returns>User details</returns>
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(AdminUserResponse), 200)]
     [ProducesResponseType(404)]
-    public async Task<IActionResult> GetUserById(int id)
+    public async Task<IActionResult> GetUserById(Guid id)
     {
         try
         {
@@ -200,11 +200,11 @@ public class AdminUsersController : ControllerBase
     /// <param name="id">User ID</param>
     /// <param name="request">Update request</param>
     /// <returns>Updated user details</returns>
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(AdminUserResponse), 200)]
     [ProducesResponseType(404)]
     [ProducesResponseType(typeof(object), 400)]
-    public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserRequest request)
+    public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserRequest request)
     {
         try
         {
@@ -241,11 +241,11 @@ public class AdminUsersController : ControllerBase
     /// <param name="id">User ID</param>
     /// <param name="request">Password update request</param>
     /// <returns>Success status</returns>
-    [HttpPut("{id:int}/password")]
+    [HttpPut("{id:guid}/password")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
     [ProducesResponseType(typeof(object), 400)]
-    public async Task<IActionResult> UpdateUserPassword(int id, [FromBody] UpdateUserPasswordRequest request)
+    public async Task<IActionResult> UpdateUserPassword(Guid id, [FromBody] UpdateUserPasswordRequest request)
     {
         try
         {
@@ -276,11 +276,11 @@ public class AdminUsersController : ControllerBase
     /// </remarks>
     /// <param name="id">User ID</param>
     /// <returns>Success status</returns>
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id:guid}")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
     [ProducesResponseType(typeof(object), 400)]
-    public async Task<IActionResult> DeleteUser(int id)
+    public async Task<IActionResult> DeleteUser(Guid id)
     {
         try
         {
@@ -306,11 +306,11 @@ public class AdminUsersController : ControllerBase
     /// </summary>
     /// <param name="id">User ID</param>
     /// <returns>Success status with new status</returns>
-    [HttpPatch("{id:int}/toggle-status")]
+    [HttpPatch("{id:guid}/toggle-status")]
     [ProducesResponseType(200)]
     [ProducesResponseType(404)]
     [ProducesResponseType(typeof(object), 400)]
-    public async Task<IActionResult> ToggleUserStatus(int id)
+    public async Task<IActionResult> ToggleUserStatus(Guid id)
     {
         try
         {

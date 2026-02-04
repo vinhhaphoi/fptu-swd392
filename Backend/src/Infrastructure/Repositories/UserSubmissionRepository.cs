@@ -14,7 +14,7 @@ public class UserSubmissionRepository : IUserSubmissionRepository
     public async Task<List<UserSubmission>> GetBySessionIdAsync(int sessionId) =>
         await _context.UserSubmissions.AsNoTracking().Where(x => x.SessionId == sessionId).OrderByDescending(x => x.SubmittedAt).ToListAsync();
 
-    public async Task<List<UserSubmission>> GetByUserIdAsync(int userId) =>
+    public async Task<List<UserSubmission>> GetByUserIdAsync(Guid userId) =>
         await _context.UserSubmissions
             .AsNoTracking()
             .Include(x => x.Session)

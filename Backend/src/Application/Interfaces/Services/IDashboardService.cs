@@ -4,5 +4,5 @@ namespace Application.Interfaces.Services;
 
 public interface IDashboardService
 {
-    Task<DashboardStatsResponse> GetUserStatsAsync(int userId);
+    Task<DashboardStatsResponse> GetUserStatsAsync(Guid userId);
 }

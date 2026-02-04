@@ -32,13 +32,13 @@ public class UserService : IUserService
         return user == null ? null : MapToProfile(user);
     }
 
-    public async Task<UserProfileResponse?> GetProfileByIdAsync(int userId)
+    public async Task<UserProfileResponse?> GetProfileByIdAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         return user == null ? null : MapToProfile(user);
     }
 
-    public async Task<UserProfileResponse?> UpdateProfileAsync(int userId, UpdateProfileRequest request)
+    public async Task<UserProfileResponse?> UpdateProfileAsync(Guid userId, UpdateProfileRequest request)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return null;
@@ -126,7 +126,7 @@ public class UserService : IUserService
         return responses;
     }
 
-    public async Task<AdminUserResponse?> GetUserByIdForAdminAsync(int userId)
+    public async Task<AdminUserResponse?> GetUserByIdForAdminAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return null;
@@ -200,7 +200,7 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<AdminUserResponse?> UpdateUserAsync(int userId, UpdateUserRequest request)
+    public async Task<AdminUserResponse?> UpdateUserAsync(Guid userId, UpdateUserRequest request)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return null;
@@ -238,7 +238,7 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<bool> UpdateUserPasswordAsync(int userId, UpdateUserPasswordRequest request)
+    public async Task<bool> UpdateUserPasswordAsync(Guid userId, UpdateUserPasswordRequest request)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return false;
@@ -250,7 +250,7 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<bool> DeleteUserAsync(int userId)
+    public async Task<bool> DeleteUserAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return false;
@@ -263,7 +263,7 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<bool> ToggleUserStatusAsync(int userId)
+    public async Task<bool> ToggleUserStatusAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return false;

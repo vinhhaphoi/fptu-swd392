@@ -14,10 +14,10 @@ public class PracticeSessionsController : ControllerBase
 
     public PracticeSessionsController(IPracticeSessionRepository repo) => _repo = repo;
 
-    private int? GetCurrentUserId()
+    private Guid? GetCurrentUserId()
     {
         var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        return int.TryParse(claim, out var id) ? id : null;
+        return Guid.TryParse(claim, out var id) ? id : null;
     }
 
     [HttpGet("my")]

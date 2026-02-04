@@ -17,6 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
+
+
 // Configure FluentValidation - DISABLE auto-validation for async validators
 // We'll validate manually in controllers to support async rules
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
@@ -140,4 +142,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+app.Run();  
