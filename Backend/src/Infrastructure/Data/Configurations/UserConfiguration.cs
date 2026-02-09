@@ -34,8 +34,7 @@ namespace Infrastructure.Data.Configurations
 
             builder.Property(e => e.PasswordHash)
                    .HasColumnName("password_hash")
-                   .HasMaxLength(500)
-                   .IsRequired();
+                   .HasMaxLength(255);
 
             builder.Property(e => e.Role)
                    .HasColumnName("role")
@@ -66,7 +65,7 @@ namespace Infrastructure.Data.Configurations
             // Indexes
             builder.HasIndex(e => e.Username).IsUnique();
             builder.HasIndex(e => e.Email).IsUnique();
-            builder.HasIndex(e => e.PhoneNumber).IsUnique().HasFilter("[phone_number] IS NOT NULL");
+            builder.HasIndex(e => e.PhoneNumber).IsUnique().HasFilter("\"phone_number\" IS NOT NULL");
         }
     }
 }

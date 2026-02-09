@@ -24,7 +24,7 @@ public class AIEvaluationService : IAIEvaluationService
         _criteriaRepository = criteriaRepository;
     }
 
-    public async Task<EvaluationResponse> EvaluateSubmissionAsync(int submissionId)
+    public async Task<EvaluationResponse> EvaluateSubmissionAsync(Guid submissionId)
     {
         var submission = await _submissionRepository.GetByIdAsync(submissionId);
         if (submission == null) throw new InvalidOperationException("Submission not found");

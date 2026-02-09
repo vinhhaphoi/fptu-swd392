@@ -11,7 +11,7 @@ public class UserSubmissionRepository : IUserSubmissionRepository
 
     public UserSubmissionRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<List<UserSubmission>> GetBySessionIdAsync(int sessionId) =>
+    public async Task<List<UserSubmission>> GetBySessionIdAsync(Guid sessionId) =>
         await _context.UserSubmissions.AsNoTracking().Where(x => x.SessionId == sessionId).OrderByDescending(x => x.SubmittedAt).ToListAsync();
 
     public async Task<List<UserSubmission>> GetByUserIdAsync(Guid userId) =>
@@ -25,7 +25,7 @@ public class UserSubmissionRepository : IUserSubmissionRepository
             .OrderByDescending(x => x.SubmittedAt)
             .ToListAsync();
 
-    public async Task<UserSubmission?> GetByIdAsync(int id) => await _context.UserSubmissions.FindAsync(id);
+    public async Task<UserSubmission?> GetByIdAsync(Guid id) => await _context.UserSubmissions.FindAsync(id);
 
     public async Task<UserSubmission> CreateAsync(UserSubmission entity)
     {

@@ -1,4 +1,4 @@
-﻿using Infrastructure.Data.DbContexts;
+using Infrastructure.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,16 +14,23 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Register Supabase client
+        // Register Supabase client (anon or service role; auth is BE-only so anon optional)
         var supabaseUrl = configuration.GetValue<string>("Supabase:Url");
-        var supabaseKey = configuration.GetValue<string>("Supabase:Key");
+        var supabaseAnonKey = configuration.GetValue<string>("Supabase:AnonKey");
+        var supabaseServiceKey = configuration.GetValue<string>("Supabase:ServiceRoleKey");
+        var key = !string.IsNullOrWhiteSpace(supabaseAnonKey) ? supabaseAnonKey : supabaseServiceKey;
+        services.AddSingleton<Client>(_ => new Client(supabaseUrl!, key));
         
-        services.AddSingleton<Client>(_ => new Client(supabaseUrl, supabaseKey));
+        // Configure Supabase options for email validation
+        // Note: Email validation is typically handled at the Supabase dashboard level
         
 
         
-        // Register DbContext with PostgreSQL for Supabase
-        var connectionString = configuration.GetConnectionString("PoolerConnection");
+        // Register DbContext: prefer Pooler (Session mode) - supports IPv4; Direct is IPv6-only and can cause DNS "no data of requested type"
+        var connectionString = configuration.GetConnectionString("PoolerConnection")
+            ?? configuration.GetConnectionString("DirectConnection");
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException("ConnectionStrings:DirectConnection or PoolerConnection is required.");
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
 

@@ -21,13 +21,14 @@ A comprehensive backend API built with ASP.NET Core 8.0 following Clean Architec
 
 ### Features
 
-- User authentication and authorization with JWT
+- **Supabase Authentication Integration** - Built-in user management, JWT handling, and OAuth
 - Practice modes and sessions management
 - Exam structure and content management
 - Topic and part organization
 - Submission tracking and review system
-- Role-based access control (RBAC)
+- Role-based access control (RBAC) with Row Level Security
 - Password reset functionality
+- Automatic profile creation and management
 - Health check endpoints
 
 ### Key Highlights
@@ -336,30 +337,60 @@ Update your connection string in `src/API/appsettings.json` or `src/API/appsetti
 
 ## Authentication & Authorization
 
+### Supabase Authentication Integration
+
+The system uses **Supabase Auth** for enterprise-grade authentication and **JWT** for stateless authorization:
+
+**Authentication (Handled by Supabase)**:
+- ✅ Built-in user registration, login, and password reset
+- ✅ Social login (Google, GitHub, etc.) support
+- ✅ JWT token generation and management
+- ✅ Automatic session handling
+
+**Authorization (Handled by Application)**:
+- ✅ Custom JWT tokens with application-specific claims
+- ✅ Row Level Security (RLS) for data access control
+- ✅ Role-based access control (RBAC)
+- ✅ Fine-grained permissions through business logic
+
 ### Authentication Flow
 
-The system uses **JWT (JSON Web Token)** for stateless authentication:
+1. User registers/logins via Supabase Auth (`auth.users`)
+2. Supabase returns JWT token and session data
+3. Application retrieves extended profile data from `profiles` table
+4. Application generates custom JWT with business logic claims
+5. Client uses both tokens for API authentication
+6. RLS policies enforce data access control at database level
 
-1. User logs in with username and password
-2. Server validates credentials (BCrypt password verification)
-3. Server generates a JWT token with user claims
-4. Client includes token in `Authorization: Bearer <token>` header for subsequent requests
-5. Server validates token on each protected endpoint
+### Supabase Integration Benefits
+
+- **No password management** - Supabase handles secure storage
+- **Built-in OAuth** - Social login providers
+- **Automatic JWT handling** - No custom token management
+- **Real-time security** - Automatic security updates
+- **Enterprise features** - Audit logging, MFA, team management
+
+### Application Authorization
+
+- **Business Logic Separation** - Clean separation between auth (Supabase) and authorization (application)
+- **Profiles Table** - Extends Supabase auth with application data
+- **Row Level Security** - Database-level data protection
+- **Custom Permissions** - Role-based access control through policies
 
 ### Password Security
 
-- **Hashing Algorithm**: BCrypt with auto-generated salt
-- **Password Storage**: Only hashed passwords are stored (never plain text)
-- **Reset Tokens**: Stored in `password_reset_tokens` table with 24-hour expiration
+- **Hashing**: Supabase handles secure password hashing
+- **Storage**: No passwords stored in application database
+- **Reset**: Supabase managed password reset flow
+- **Sessions**: Automatic session management and expiration
 
 ### User Roles
 
-| Role | Value | Description |
-|------|-------|-------------|
-| **Guest** | 0 | Unauthenticated users (limited access) |
-| **User** | 1 | Standard authenticated users |
-| **Manager** | 2 | Elevated privileges for content management |
-| **Admin** | 3 | Full system access |
+| Role | Description | Permissions |
+|------|-------------|------------|
+| **User** | Standard authenticated users | Basic access to practice features |
+| **Teacher** | Educators and instructors | Extended access for monitoring student progress |
+| **Admin** | System administrators | Full system access and management capabilities |
 
 ### Authorization Policies
 

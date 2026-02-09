@@ -26,6 +26,18 @@ namespace Infrastructure.Data.Configurations
                    .HasColumnName("description")
                    .HasMaxLength(500);
 
+            builder.Property(e => e.DurationMinutes)
+                   .HasColumnName("duration_minutes");
+
+            builder.Property(e => e.IsActive)
+                   .HasColumnName("is_active");
+
+            builder.Property(e => e.CreatedAt)
+                   .HasColumnName("created_at");
+
+            builder.Property(e => e.UpdatedAt)
+                   .HasColumnName("updated_at");
+
             // Relationships
             builder.HasMany(es => es.Parts)
                    .WithOne(p => p.ExamStructure)

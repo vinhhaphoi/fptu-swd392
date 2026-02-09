@@ -34,6 +34,16 @@ namespace Infrastructure.Data.Configurations
             builder.Property(e => e.MaxWords)
                    .HasColumnName("max_words");
 
+            builder.Property(e => e.PartNumber)
+                   .HasColumnName("part_number");
+
+            builder.Property(e => e.Title)
+                   .HasColumnName("title")
+                   .HasMaxLength(200);
+
+            builder.Property(e => e.Instructions)
+                   .HasColumnName("instructions");
+
             // Relationships
             builder.HasOne(p => p.ExamStructure)
                    .WithMany(es => es.Parts)

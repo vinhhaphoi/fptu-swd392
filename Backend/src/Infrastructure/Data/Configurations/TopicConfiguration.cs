@@ -38,6 +38,24 @@ namespace Infrastructure.Data.Configurations
                    .HasColumnName("difficulty_level_id")
                    .IsRequired();
 
+            builder.Property(e => e.Description)
+                   .HasColumnName("description");
+
+            builder.Property(e => e.Content)
+                   .HasColumnName("content");
+
+            builder.Property(e => e.MinWords)
+                   .HasColumnName("min_words");
+
+            builder.Property(e => e.MaxWords)
+                   .HasColumnName("max_words");
+
+            builder.Property(e => e.IsActive)
+                   .HasColumnName("is_active");
+
+            builder.Property(e => e.CreatedAt)
+                   .HasColumnName("created_at");
+
             // Relationships
             builder.HasOne(t => t.Part)
                    .WithMany(p => p.Topics)

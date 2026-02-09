@@ -102,7 +102,7 @@ public class TopicsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "ManagerOrAdmin")]
+    [Authorize(Policy = "Authenticated")]
     public async Task<IActionResult> Create([FromBody] CreateTopicRequest request)
     {
         var entity = new Topic
@@ -119,7 +119,7 @@ public class TopicsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Policy = "ManagerOrAdmin")]
+    [Authorize(Policy = "Authenticated")]
     public async Task<IActionResult> Update(int id, [FromBody] CreateTopicRequest request)
     {
         var existing = await _repo.GetByIdAsync(id);

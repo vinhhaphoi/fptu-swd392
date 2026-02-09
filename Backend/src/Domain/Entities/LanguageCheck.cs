@@ -3,7 +3,7 @@ namespace Domain.Entities;
 public class LanguageCheck
 {
     public int Id { get; set; }
-    public int SubmissionId { get; set; }
+    public Guid SubmissionId { get; set; }
     public int SpellingErrors { get; set; }
     public int GrammarErrors { get; set; }
     public int SyntaxErrors { get; set; }

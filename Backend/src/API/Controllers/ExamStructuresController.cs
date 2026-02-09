@@ -24,7 +24,7 @@ public class ExamStructuresController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "ManagerOrAdmin")]
+    [Authorize(Policy = "Authenticated")]
     public async Task<IActionResult> Create([FromBody] CreateExamStructureRequest request)
     {
         var entity = new ExamStructure
@@ -38,7 +38,7 @@ public class ExamStructuresController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Policy = "ManagerOrAdmin")]
+    [Authorize(Policy = "Authenticated")]
     public async Task<IActionResult> Update(int id, [FromBody] CreateExamStructureRequest request)
     {
         var existing = await _repo.GetByIdAsync(id);

@@ -28,8 +28,8 @@ public class PracticeSessionsController : ControllerBase
         return Ok(await _repo.GetByUserIdAsync(userId.Value));
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
         var item = await _repo.GetByIdAsync(id);
         if (item == null) return NotFound();

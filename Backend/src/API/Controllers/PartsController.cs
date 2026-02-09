@@ -25,7 +25,7 @@ public class PartsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Policy = "ManagerOrAdmin")]
+    [Authorize(Policy = "Authenticated")]
     public async Task<IActionResult> Create([FromBody] CreatePartRequest request)
     {
         var entity = new Part
@@ -42,7 +42,7 @@ public class PartsController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Policy = "ManagerOrAdmin")]
+    [Authorize(Policy = "Authenticated")]
     public async Task<IActionResult> Update(int id, [FromBody] CreatePartRequest request)
     {
         var existing = await _repo.GetByIdAsync(id);

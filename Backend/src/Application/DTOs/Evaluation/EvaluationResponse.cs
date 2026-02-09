@@ -10,7 +10,7 @@ public class CriteriaScoreDto
 
 public class EvaluationResponse
 {
-    public int SubmissionId { get; set; }
+    public Guid SubmissionId { get; set; }
     public float TotalScore { get; set; }
     public string? EstimatedLevel { get; set; }
     public string? OverallFeedback { get; set; }

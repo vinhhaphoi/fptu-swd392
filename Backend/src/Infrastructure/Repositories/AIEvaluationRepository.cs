@@ -11,13 +11,13 @@ public class AIEvaluationRepository : IAIEvaluationRepository
 
     public AIEvaluationRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<AIEvaluation?> GetBySubmissionIdAsync(int submissionId) =>
+    public async Task<AIEvaluation?> GetBySubmissionIdAsync(Guid submissionId) =>
         await _context.AIEvaluations
             .Include(x => x.CriteriaScores)
             .ThenInclude(x => x.Criteria)
             .FirstOrDefaultAsync(x => x.SubmissionId == submissionId);
 
-    public async Task<AIEvaluation?> GetByIdAsync(int id) => 
+    public async Task<AIEvaluation?> GetByIdAsync(Guid id) => 
         await _context.AIEvaluations
             .Include(x => x.CriteriaScores)
             .ThenInclude(x => x.Criteria)

@@ -1,10 +1,12 @@
 namespace Domain.Entities;
 
+using System;
+
 public class VocabularySet
 {
-    public int Id { get; set; }
-    public int TopicId { get; set; }
-    public int LevelId { get; set; }
+    public int Id { get; set; }      // Kept as int to match vocab_set_id in DB
+    public int TopicId { get; set; } // Matches topic_id in DB
+    public int LevelId { get; set; } // Matches level_id in DB
     public string? Name { get; set; }
     public string? Description { get; set; }
 

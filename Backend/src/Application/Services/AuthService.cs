@@ -4,145 +4,106 @@ using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Enums;
 using System.Security.Cryptography;
-using SupabaseUser = Supabase.Gotrue.User;
 
 namespace Application.Services;
 
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
-    private readonly IJwtService _jwtService;
     private readonly IPasswordResetTokenRepository _passwordResetTokenRepository;
-    private readonly Supabase.Client _supabaseClient;
+    private readonly IPasswordHasher _passwordHasher;
+    private readonly IJwtService _jwtService;
 
     public const int ResetTokenExpirationHours = 24;
 
     public AuthService(
         IUserRepository userRepository,
-        IJwtService jwtService,
         IPasswordResetTokenRepository passwordResetTokenRepository,
-        Supabase.Client supabaseClient)
+        IPasswordHasher passwordHasher,
+        IJwtService jwtService)
     {
         _userRepository = userRepository;
-        _jwtService = jwtService;
         _passwordResetTokenRepository = passwordResetTokenRepository;
-        _supabaseClient = supabaseClient;
+        _passwordHasher = passwordHasher;
+        _jwtService = jwtService;
     }
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
-        // First authenticate with Supabase
-        try
-        {
-            // Try to find user by email first (Supabase primary authentication method)
-            var userByEmail = await _userRepository.GetByEmailAsync(request.Username);
-            var email = userByEmail?.Email ?? request.Username; // If request.Username is actually an email
-            
-            var session = await _supabaseClient.Auth.SignIn(email, request.Password);
-            
-            // If authentication succeeds with Supabase, get user profile from our database
-            var user = await _userRepository.GetByUsernameAsync(request.Username);
-            
-            // If not found by username, try to find by email
-            if (user == null)
-            {
-                user = await _userRepository.GetByEmailAsync(request.Username);
-            }
-            
-            if (user == null)
-            {
-                // If user exists in auth but not in profiles, create the profile
-                user = new User
-                {
-                    Id = Guid.Parse(session.User.Id),
-                    Name = request.Username, // Default name
-                    Username = request.Username,
-                    Email = session.User.Email,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                    Role = Role.User,
-                    CreatedAt = DateTime.UtcNow,
-                    IsActive = true
-                };
-                user = await _userRepository.CreateAsync(user);
-            }
-            
-            if (!user.IsActive)
-            {
-                throw new UnauthorizedAccessException("Account is deactivated");
-            }
+        // Accept username or email in the same field
+        var user = await _userRepository.GetByUsernameAsync(request.Username)
+            ?? await _userRepository.GetByEmailAsync(request.Username);
 
-            var token = _jwtService.GenerateToken(user);
-            var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-            var jwtToken = tokenHandler.ReadJwtToken(token);
-            var expiresAt = jwtToken.ValidTo;
-
-            return new AuthResponse
-            {
-                Token = token,
-                UserId = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                Role = user.Role.ToString(),
-                ExpiresAt = expiresAt
-            };
-        }
-        catch (Exception)
-        {
+        if (user == null)
             throw new UnauthorizedAccessException("Invalid username or password");
-        }
-    }
 
-    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
-    {
-        // Note: Username and email uniqueness validation is now handled by FluentValidation
-        // in RegisterRequestValidator before this method is called
-        
-        // First, create the user in Supabase Auth
-        var session = await _supabaseClient.Auth.SignUp(request.Email, request.Password);
-        
-        // Now create the profile in our application database with the same UUID
-        var appUser = new User
-        {
-            Id = Guid.Parse(session.User.Id), // Use the UUID from Supabase Auth
-            Name = string.IsNullOrWhiteSpace(request.Name) ? request.Username : request.Name,
-            Username = request.Username,
-            Email = request.Email,
-            PhoneNumber = request.PhoneNumber,
-            // We don't store the password hash here since Supabase handles authentication
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            Role = Role.User, // Always User role for new registrations
-            TargetLevelId = null, // Will be set later if needed
-            CreatedAt = DateTime.UtcNow,
-            IsActive = true
-        };
+        if (string.IsNullOrEmpty(user.PasswordHash))
+            throw new UnauthorizedAccessException("Invalid username or password");
 
-        var createdUser = await _userRepository.CreateAsync(appUser);
-        var token = _jwtService.GenerateToken(createdUser);
-        var tokenHandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
-        var jwtToken = tokenHandler.ReadJwtToken(token);
-        var expiresAt = jwtToken.ValidTo;
+        if (!_passwordHasher.Verify(request.Password, user.PasswordHash))
+            throw new UnauthorizedAccessException("Invalid username or password");
+
+        if (!user.IsActive)
+            throw new UnauthorizedAccessException("Account is deactivated");
+
+        var roleName = user.Role.ToString();
+        var token = _jwtService.GenerateToken(user.Id, user.Username!, user.Email!, roleName);
+        var expMinutes = _jwtService.GetExpirationMinutes();
 
         return new AuthResponse
         {
             Token = token,
-            UserId = createdUser.Id,
-            Username = createdUser.Username,
-            Email = createdUser.Email,
-            Role = createdUser.Role.ToString(),
-            ExpiresAt = expiresAt
+            UserId = user.Id,
+            Username = user.Username!,
+            Email = user.Email!,
+            Role = roleName,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(expMinutes)
         };
     }
 
-    public async Task<bool> ValidateTokenAsync(string token)
+    public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
-        return _jwtService.ValidateToken(token);
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Name = request.Name,
+            Username = request.Username,
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            PasswordHash = _passwordHasher.Hash(request.Password),
+            Role = Role.User,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _userRepository.CreateAsync(user);
+
+        var roleName = user.Role.ToString();
+        var token = _jwtService.GenerateToken(user.Id, user.Username, user.Email, roleName);
+        var expMinutes = _jwtService.GetExpirationMinutes();
+
+        return new AuthResponse
+        {
+            Token = token,
+            UserId = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            Role = roleName,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(expMinutes)
+        };
+    }
+
+    public Task<bool> ValidateTokenAsync(string token)
+    {
+        // Validation is done by JWT middleware; this is for interface compatibility.
+        return Task.FromResult(true);
     }
 
     public async Task ForgotPasswordAsync(ForgotPasswordRequest request)
     {
         var user = await _userRepository.GetByEmailAsync(request.Email);
         if (user == null)
-            return; // Don't reveal whether email exists
+            return;
 
         var tokenValue = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).Replace("+", "-").Replace("/", "_").TrimEnd('=');
         var resetToken = new PasswordResetToken
@@ -154,7 +115,7 @@ public class AuthService : IAuthService
             CreatedAt = DateTime.UtcNow
         };
         await _passwordResetTokenRepository.CreateAsync(resetToken);
-        // TODO: Send email with reset link containing tokenValue (e.g. https://yourapp.com/reset-password?token=...)
+        // TODO: Send email with reset link containing tokenValue
     }
 
     public async Task ResetPasswordAsync(ResetPasswordRequest request)
@@ -167,7 +128,7 @@ public class AuthService : IAuthService
         if (user == null)
             throw new InvalidOperationException("User not found");
 
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        user.PasswordHash = _passwordHasher.Hash(request.NewPassword);
         user.UpdatedAt = DateTime.UtcNow;
         await _userRepository.UpdateAsync(user);
 
@@ -181,12 +142,11 @@ public class AuthService : IAuthService
         if (user == null)
             throw new UnauthorizedAccessException("User not found");
 
-        if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
+        if (string.IsNullOrEmpty(user.PasswordHash) || !_passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
             throw new UnauthorizedAccessException("Current password is incorrect");
 
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        user.PasswordHash = _passwordHasher.Hash(request.NewPassword);
         user.UpdatedAt = DateTime.UtcNow;
         await _userRepository.UpdateAsync(user);
     }
 }
-

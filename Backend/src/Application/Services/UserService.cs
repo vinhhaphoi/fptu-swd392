@@ -3,7 +3,6 @@ using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Domain.Entities;
 using Domain.Enums;
-using BCrypt.Net;
 
 namespace Application.Services;
 
@@ -13,17 +12,20 @@ public class UserService : IUserService
     private readonly IPracticeSessionRepository _sessionRepository;
     private readonly IUserSubmissionRepository _submissionRepository;
     private readonly ILevelRepository _levelRepository;
+    private readonly IPasswordHasher _passwordHasher;
 
     public UserService(
         IUserRepository userRepository,
         IPracticeSessionRepository sessionRepository,
         IUserSubmissionRepository submissionRepository,
-        ILevelRepository levelRepository)
+        ILevelRepository levelRepository,
+        IPasswordHasher passwordHasher)
     {
         _userRepository = userRepository;
         _sessionRepository = sessionRepository;
         _submissionRepository = submissionRepository;
         _levelRepository = levelRepository;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<UserProfileResponse?> GetProfileByUsernameAsync(string username)
@@ -166,14 +168,16 @@ public class UserService : IUserService
         
         var user = new User
         {
+            Id = Guid.NewGuid(),
             Name = request.Name,
             Username = request.Username,
             Email = request.Email,
             PhoneNumber = request.PhoneNumber,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            PasswordHash = _passwordHasher.Hash(request.Password),
             Role = request.Role,
             TargetLevelId = request.TargetLevelId,
-            IsActive = request.IsActive
+            IsActive = request.IsActive,
+            CreatedAt = DateTime.UtcNow
         };
         
         var createdUser = await _userRepository.CreateAsync(user);
@@ -243,7 +247,7 @@ public class UserService : IUserService
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return false;
         
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        user.PasswordHash = _passwordHasher.Hash(request.NewPassword);
         user.UpdatedAt = DateTime.UtcNow;
         
         await _userRepository.UpdateAsync(user);

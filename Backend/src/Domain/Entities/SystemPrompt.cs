@@ -1,11 +1,13 @@
 namespace Domain.Entities;
 
+using System;
+
 public class SystemPrompt
 {
-    public int Id { get; set; }
-    public int PartId { get; set; }
-    public int LevelId { get; set; }
-    public int PurposeId { get; set; }
+    public int Id { get; set; }      // Kept as int to match prompt_id in DB
+    public int PartId { get; set; }  // Matches part_id in DB
+    public int LevelId { get; set; } // Matches level_id in DB
+    public int PurposeId { get; set; } // Matches purpose_id in DB
     public string PromptContent { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

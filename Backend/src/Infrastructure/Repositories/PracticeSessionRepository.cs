@@ -12,9 +12,9 @@ public class PracticeSessionRepository : IPracticeSessionRepository
     public PracticeSessionRepository(ApplicationDbContext context) => _context = context;
 
     public async Task<List<PracticeSession>> GetByUserIdAsync(Guid userId) =>
-        await _context.PracticeSessions.AsNoTracking().Where(x => x.UserId == userId).OrderByDescending(x => x.CreatedAt).ToListAsync();
+        await _context.PracticeSessions.AsNoTracking().Where(x => x.UserId == userId).OrderByDescending(x => x.StartedAt).ToListAsync();
 
-    public async Task<PracticeSession?> GetByIdAsync(int id) => await _context.PracticeSessions.FindAsync(id);
+    public async Task<PracticeSession?> GetByIdAsync(Guid id) => await _context.PracticeSessions.FindAsync(id);
 
     public async Task<PracticeSession> CreateAsync(PracticeSession entity)
     {

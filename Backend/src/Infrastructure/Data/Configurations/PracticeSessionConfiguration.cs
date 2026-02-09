@@ -25,9 +25,15 @@ namespace Infrastructure.Data.Configurations
                    .HasColumnName("is_random")
                    .IsRequired();
 
-            builder.Property(e => e.CreatedAt)
-                   .HasColumnName("created_at")
+            builder.Property(e => e.StartedAt)
+                   .HasColumnName("started_at")
                    .IsRequired();
+
+            builder.Property(e => e.EndedAt)
+                   .HasColumnName("ended_at");
+
+            builder.Property(e => e.Status)
+                   .HasColumnName("status");
 
             // Relationships
             builder.HasOne(ps => ps.User)

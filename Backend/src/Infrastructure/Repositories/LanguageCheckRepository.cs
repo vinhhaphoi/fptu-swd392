@@ -11,7 +11,7 @@ public class LanguageCheckRepository : ILanguageCheckRepository
 
     public LanguageCheckRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<LanguageCheck?> GetBySubmissionIdAsync(int submissionId) =>
+    public async Task<LanguageCheck?> GetBySubmissionIdAsync(Guid submissionId) =>
         await _context.LanguageChecks.AsNoTracking().FirstOrDefaultAsync(x => x.SubmissionId == submissionId);
 
     public async Task<LanguageCheck> CreateAsync(LanguageCheck entity)

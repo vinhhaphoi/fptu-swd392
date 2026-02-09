@@ -4,6 +4,7 @@ using Application.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace API.Controllers;
@@ -15,15 +16,18 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
     private readonly IValidator<RegisterRequest> _registerValidator;
+    private readonly IHostEnvironment _env;
 
     public AuthController(
-        IAuthService authService, 
+        IAuthService authService,
         ILogger<AuthController> logger,
-        IValidator<RegisterRequest> registerValidator)
+        IValidator<RegisterRequest> registerValidator,
+        IHostEnvironment env)
     {
         _authService = authService;
         _logger = logger;
         _registerValidator = registerValidator;
+        _env = env;
     }
 
     /// <summary>
@@ -145,11 +149,17 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            // Unexpected errors
-            _logger.LogError(ex, "Unexpected error during registration. Username: {Username}, Email: {Email}. Exception: {Exception}", 
+            // Unexpected errors - log full detail; in Development return actual error for debugging
+            _logger.LogError(ex, "Unexpected error during registration. Username: {Username}, Email: {Email}. Exception: {Exception}",
                 request.Username, request.Email, ex);
-            
-            return StatusCode(500, new { message = "An unexpected error occurred during registration. Please try again later." });
+
+            var message = "An unexpected error occurred during registration. Please try again later.";
+            if (_env.IsDevelopment())
+            {
+                var detail = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, new { message, detail, stackTrace = ex.StackTrace });
+            }
+            return StatusCode(500, new { message });
         }
     }
 

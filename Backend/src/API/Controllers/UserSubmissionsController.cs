@@ -31,8 +31,8 @@ public class UserSubmissionsController : ControllerBase
         return Guid.TryParse(claim, out var id) ? id : null;
     }
 
-    [HttpGet("by-session/{sessionId:int}")]
-    public async Task<IActionResult> GetBySession(int sessionId)
+    [HttpGet("by-session/{sessionId}")]
+    public async Task<IActionResult> GetBySession(Guid sessionId)
     {
         var session = await _sessionRepo.GetByIdAsync(sessionId);
         if (session == null) return NotFound();
@@ -41,8 +41,8 @@ public class UserSubmissionsController : ControllerBase
         return Ok(await _repo.GetBySessionIdAsync(sessionId));
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
         var item = await _repo.GetByIdAsync(id);
         if (item == null) return NotFound();
@@ -53,8 +53,8 @@ public class UserSubmissionsController : ControllerBase
         return Ok(item);
     }
 
-    [HttpGet("{id:int}/evaluation")]
-    public async Task<IActionResult> GetEvaluation(int id)
+    [HttpGet("{id}/evaluation")]
+    public async Task<IActionResult> GetEvaluation(Guid id)
     {
         var submission = await _repo.GetByIdAsync(id);
         if (submission == null) return NotFound();
@@ -103,7 +103,7 @@ public class UserSubmissionsController : ControllerBase
 
 public class CreateUserSubmissionRequest
 {
-    public int SessionId { get; set; }
+    public Guid SessionId { get; set; }
     public int TopicId { get; set; }
     public int PartId { get; set; }
     public string Content { get; set; } = string.Empty;

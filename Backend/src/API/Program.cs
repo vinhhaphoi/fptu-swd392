@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Services;
+using Application.Interfaces.Services;
 using Application.Services;
 using Application.Validators;
 using FluentValidation;
@@ -17,10 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-
-
 // Configure FluentValidation - DISABLE auto-validation for async validators
-// We'll validate manually in controllers to support async rules
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 
 // Configure CORS
@@ -35,39 +32,33 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configure JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = jwtSettings["SecretKey"] ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!";
-var issuer = jwtSettings["Issuer"] ?? "VSTEP_Writing_System";
-var audience = jwtSettings["Audience"] ?? "VSTEP_Writing_System";
+// Backend-only JWT Authentication (no Supabase Auth)
+var jwtSecret = builder.Configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey is required");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "VSTEP.Backend";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "VSTEP.Client";
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ValidateIssuer = true,
-        ValidIssuer = issuer,
-        ValidateAudience = true,
-        ValidAudience = audience,
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
-    };
-});
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
-// Configure Authorization Policies
+// Role-based Authorization: Guest, User, Manager, Admin
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("ManagerOrAdmin", policy => policy.RequireRole("Manager", "Admin"));
-    options.AddPolicy("UserOrAbove", policy => policy.RequireRole("User", "Manager", "Admin"));
     options.AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
+    options.AddPolicy("AdminOnly", policy => policy.RequireAuthenticatedUser().RequireRole("Admin"));
+    options.AddPolicy("ManagerOrAdmin", policy => policy.RequireAuthenticatedUser().RequireRole("Admin", "Manager"));
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -78,7 +69,7 @@ builder.Services.AddSwaggerGen(c =>
     { 
         Title = "VSTEP Writing System API", 
         Version = "v1",
-        Description = "Backend API for VSTEP Writing System with JWT Authentication"
+        Description = "Backend API for VSTEP Writing System with JWT Authentication (Guest, User, Manager, Admin)"
     });
 
     // Add JWT Authentication to Swagger
@@ -108,9 +99,10 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Register Application Services
-builder.Services.AddScoped<IAuthService, AuthService>();
+// Register Application Services (backend-only auth)
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILearningService, LearningService>();
 builder.Services.AddScoped<IHintService, HintService>();

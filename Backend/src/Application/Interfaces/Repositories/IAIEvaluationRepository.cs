@@ -4,8 +4,8 @@ namespace Application.Interfaces.Repositories;
 
 public interface IAIEvaluationRepository
 {
-    Task<AIEvaluation?> GetBySubmissionIdAsync(int submissionId);
-    Task<AIEvaluation?> GetByIdAsync(int id);
+    Task<AIEvaluation?> GetBySubmissionIdAsync(Guid submissionId);
+    Task<AIEvaluation?> GetByIdAsync(Guid id);
     Task<AIEvaluation> CreateAsync(AIEvaluation entity);
     Task<AIEvaluation> UpdateAsync(AIEvaluation entity);
 }

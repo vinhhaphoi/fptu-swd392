@@ -1,9 +1,11 @@
 namespace Domain.Entities;
 
+using System;
+
 public class AIEvaluation
 {
-    public int Id { get; set; }
-    public int SubmissionId { get; set; }
+    public Guid Id { get; set; }           // Changed from int to Guid to match evaluation_id in DB
+    public Guid SubmissionId { get; set; } // Changed from int to Guid to match submission_id in DB
     public float? TotalScore { get; set; }
     public int? EstimatedLevelId { get; set; }
     public string? OverallFeedback { get; set; }

@@ -4,5 +4,5 @@ namespace Application.Interfaces.Services;
 
 public interface IAIEvaluationService
 {
-    Task<EvaluationResponse> EvaluateSubmissionAsync(int submissionId);
+    Task<EvaluationResponse> EvaluateSubmissionAsync(Guid submissionId);
 }

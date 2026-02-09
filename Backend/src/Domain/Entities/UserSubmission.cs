@@ -1,11 +1,13 @@
 namespace Domain.Entities;
 
+using System;
+
 public class UserSubmission
 {
-    public int Id { get; set; }
-    public int SessionId { get; set; }
-    public int TopicId { get; set; }
-    public int PartId { get; set; }
+    public Guid Id { get; set; }           // Changed from int to Guid to match submission_id in DB
+    public Guid SessionId { get; set; }    // Changed from int to Guid to match session_id in DB
+    public int TopicId { get; set; }       // Matches topic_id in DB
+    public int PartId { get; set; }        // Matches part_id in DB
     public string Content { get; set; } = string.Empty;
     public int? WordCount { get; set; }
     public bool EnableHint { get; set; }

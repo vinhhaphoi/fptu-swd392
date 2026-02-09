@@ -134,24 +134,24 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("user-only")]
-    [Authorize(Policy = "UserOrAbove")]
+    [Authorize]
     public IActionResult UserOnly()
     {
-        return Ok(new { message = "This endpoint is accessible to User, Manager, and Admin" });
+        return Ok(new { message = "This endpoint is accessible to authenticated users" });
     }
 
     [HttpGet("manager-only")]
-    [Authorize(Policy = "ManagerOrAdmin")]
+    [Authorize]
     public IActionResult ManagerOnly()
     {
-        return Ok(new { message = "This endpoint is accessible to Manager and Admin only" });
+        return Ok(new { message = "This endpoint is accessible to authenticated users (role checking via RLS)" });
     }
 
     [HttpGet("admin-only")]
-    [Authorize(Policy = "AdminOnly")]
+    [Authorize]
     public IActionResult AdminOnly()
     {
-        return Ok(new { message = "This endpoint is accessible to Admin only" });
+        return Ok(new { message = "This endpoint is accessible to authenticated users (role checking via RLS)" });
     }
 
     /// <summary>
