@@ -11,15 +11,20 @@ namespace Infrastructure.Data.Configurations
             builder.ToTable("sentence_structures");
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Id).HasColumnName("structure_id");
-            builder.Property(e => e.VocabSetId).HasColumnName("vocab_set_id").IsRequired();
-            builder.Property(e => e.Pattern).HasColumnName("pattern").HasMaxLength(255).IsRequired();
-            builder.Property(e => e.UsageNote).HasColumnName("usage_note");
-            builder.Property(e => e.Example).HasColumnName("example");
+            builder.Property(e => e.TopicId).HasColumnName("topic_id").IsRequired();
+            builder.Property(e => e.LevelId).HasColumnName("level_id").IsRequired();
+            builder.Property(e => e.StructurePattern).HasColumnName("structure_pattern").HasMaxLength(255).IsRequired();
+            builder.Property(e => e.Explanation).HasColumnName("explanation");
 
-            builder.HasOne(e => e.VocabularySet)
-                   .WithMany(s => s.SentenceStructures)
-                   .HasForeignKey(e => e.VocabSetId)
+            builder.HasOne(e => e.Topic)
+                   .WithMany(t => t.SentenceStructures)
+                   .HasForeignKey(e => e.TopicId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(e => e.Level)
+                   .WithMany()
+                   .HasForeignKey(e => e.LevelId)
+                   .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

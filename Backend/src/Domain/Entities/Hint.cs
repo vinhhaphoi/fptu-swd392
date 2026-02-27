@@ -3,7 +3,7 @@ namespace Domain.Entities;
 public class Hint
 {
     public int Id { get; set; }
-    public int TopicId { get; set; }
+    public Guid TopicId { get; set; }
     public int LevelId { get; set; }
     public int HintTypeId { get; set; }
     public string Content { get; set; } = string.Empty;

@@ -11,7 +11,7 @@ public class HintRepository : IHintRepository
 
     public HintRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<List<Hint>> GetByTopicAndLevelAsync(int topicId, int levelId) =>
+    public async Task<List<Hint>> GetByTopicAndLevelAsync(Guid topicId, int levelId) =>
         await _context.Hints
             .AsNoTracking()
             .Include(x => x.HintType)

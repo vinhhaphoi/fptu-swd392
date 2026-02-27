@@ -44,58 +44,22 @@ public class TopicsController : ControllerBase
     public async Task<IActionResult> GetByPart(int partId) =>
         Ok(await _repo.GetByPartIdAsync(partId));
 
-    /// <summary>
-    /// 🔍 Get topic by ID
-    /// </summary>
-    /// <remarks>
-    /// Retrieve detailed information for a specific topic by ID.
-    /// Includes topic content, context, and metadata.
-    /// </remarks>
-    /// <param name="id">Topic ID</param>
-    /// <returns>Topic details</returns>
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
         var item = await _repo.GetByIdAsync(id);
         return item == null ? NotFound() : Ok(item);
     }
 
-    /// <summary>
-    /// 📖 Get learning resources for topic
-    /// </summary>
-    /// <remarks>
-    /// Retrieve all learning resources (vocabulary sets, sample texts) for a specific topic at given difficulty level.
-    /// Used for student learning and practice.
-    /// 
-    /// Example response:
-    /// {
-    ///   "topicId": 1,
-    ///   "vocabularySets": [...],
-    ///   "sampleTexts": [...]
-    /// }
-    /// </remarks>
-    /// <param name="id">Topic ID</param>
-    /// <param name="levelId">Difficulty level ID</param>
-    /// <returns>Learning resources for the topic</returns>
-    [HttpGet("{id:int}/learning-resources/{levelId:int}")]
-    public async Task<IActionResult> GetLearningResources(int id, int levelId)
+    [HttpGet("{id:guid}/learning-resources/{levelId:int}")]
+    public async Task<IActionResult> GetLearningResources(Guid id, int levelId)
     {
         var resources = await _learningService.GetTopicResourcesAsync(id, levelId);
         return Ok(resources);
     }
 
-    /// <summary>
-    /// 💡 Get hints for topic
-    /// </summary>
-    /// <remarks>
-    /// Retrieve helpful hints and guidance for a specific topic at given difficulty level.
-    /// Provides writing tips and strategies for students.
-    /// </remarks>
-    /// <param name="id">Topic ID</param>
-    /// <param name="levelId">Difficulty level ID</param>
-    /// <returns>List of hints for the topic</returns>
-    [HttpGet("{id:int}/hints/{levelId:int}")]
-    public async Task<IActionResult> GetHints(int id, int levelId)
+    [HttpGet("{id:guid}/hints/{levelId:int}")]
+    public async Task<IActionResult> GetHints(Guid id, int levelId)
     {
         var hints = await _hintService.GetHintsAsync(id, levelId);
         return Ok(hints);
@@ -108,35 +72,35 @@ public class TopicsController : ControllerBase
         var entity = new Topic
         {
             PartId = request.PartId,
-            TopicName = request.TopicName,
-            Context = request.Context,
+            Title = request.Title,
+            Prompt = request.Prompt,
             Purpose = request.Purpose,
             RecipientRole = request.RecipientRole,
-            DifficultyLevelId = request.DifficultyLevelId
+            LevelId = request.LevelId
         };
         var created = await _repo.CreateAsync(entity);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:guid}")]
     [Authorize(Policy = "Authenticated")]
-    public async Task<IActionResult> Update(int id, [FromBody] CreateTopicRequest request)
+    public async Task<IActionResult> Update(Guid id, [FromBody] CreateTopicRequest request)
     {
         var existing = await _repo.GetByIdAsync(id);
         if (existing == null) return NotFound();
         existing.PartId = request.PartId;
-        existing.TopicName = request.TopicName;
-        existing.Context = request.Context;
+        existing.Title = request.Title;
+        existing.Prompt = request.Prompt;
         existing.Purpose = request.Purpose;
         existing.RecipientRole = request.RecipientRole;
-        existing.DifficultyLevelId = request.DifficultyLevelId;
+        existing.LevelId = request.LevelId;
         await _repo.UpdateAsync(existing);
         return Ok(existing);
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id:guid}")]
     [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(Guid id)
     {
         var existing = await _repo.GetByIdAsync(id);
         if (existing == null) return NotFound();
@@ -145,38 +109,12 @@ public class TopicsController : ControllerBase
     }
 }
 
-/// <summary>
-/// Request model for creating/updating topics
-/// </summary>
 public class CreateTopicRequest
 {
-    /// <summary>
-    /// ID of the exam part this topic belongs to
-    /// </summary>
     public int PartId { get; set; }
-    
-    /// <summary>
-    /// Name of the topic (required)
-    /// </summary>
-    public string TopicName { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Context or background information for the topic
-    /// </summary>
-    public string? Context { get; set; }
-    
-    /// <summary>
-    /// Purpose or objective of the topic
-    /// </summary>
+    public string Title { get; set; } = string.Empty;
+    public string? Prompt { get; set; }
     public string? Purpose { get; set; }
-    
-    /// <summary>
-    /// Target recipient role for this topic
-    /// </summary>
     public string? RecipientRole { get; set; }
-    
-    /// <summary>
-    /// Difficulty level ID for this topic
-    /// </summary>
-    public int DifficultyLevelId { get; set; }
+    public int LevelId { get; set; }
 }

@@ -8,15 +8,9 @@ namespace Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.ToTable("profiles");
+            builder.ToTable("users");
             
             builder.HasKey(e => e.Id);
-            builder.Property(e => e.Id).HasColumnName("id"); // In Supabase, this is the UUID from auth.users
-
-            builder.Property(e => e.Name)
-                   .HasColumnName("name")
-                   .HasMaxLength(100)
-                   .IsRequired();
 
             builder.Property(e => e.Username)
                    .HasColumnName("username")
@@ -52,6 +46,9 @@ namespace Infrastructure.Data.Configurations
             builder.Property(e => e.UpdatedAt)
                    .HasColumnName("updated_at");
 
+            builder.Property(e => e.DeletedAt)
+                   .HasColumnName("deleted_at");
+
             builder.Property(e => e.IsActive)
                    .HasColumnName("is_active")
                    .IsRequired();
@@ -62,10 +59,14 @@ namespace Infrastructure.Data.Configurations
                    .HasForeignKey(u => u.TargetLevelId)
                    .OnDelete(DeleteBehavior.SetNull);
 
+            builder.HasOne(u => u.UserProfile)
+                   .WithOne(up => up.User)
+                   .HasForeignKey<UserProfile>(up => up.UserId);
+
             // Indexes
             builder.HasIndex(e => e.Username).IsUnique();
             builder.HasIndex(e => e.Email).IsUnique();
-            builder.HasIndex(e => e.PhoneNumber).IsUnique().HasFilter("\"phone_number\" IS NOT NULL");
+            builder.HasIndex(e => e.PhoneNumber).IsUnique().HasFilter("phone_number IS NOT NULL");
         }
     }
 }

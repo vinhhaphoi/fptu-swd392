@@ -4,5 +4,5 @@ namespace Application.Interfaces.Services;
 
 public interface ILearningService
 {
-    Task<TopicLearningResourcesResponse> GetTopicResourcesAsync(int topicId, int levelId);
+    Task<TopicLearningResourcesResponse> GetTopicResourcesAsync(Guid topicId, int levelId);
 }

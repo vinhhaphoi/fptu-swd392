@@ -10,19 +10,21 @@ namespace Application.Services;
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IUserProfileRepository _userProfileRepository;
     private readonly IPasswordResetTokenRepository _passwordResetTokenRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtService _jwtService;
-
-    public const int ResetTokenExpirationHours = 24;
+    private const int ResetTokenExpirationHours = 24;
 
     public AuthService(
         IUserRepository userRepository,
+        IUserProfileRepository userProfileRepository,
         IPasswordResetTokenRepository passwordResetTokenRepository,
         IPasswordHasher passwordHasher,
         IJwtService jwtService)
     {
         _userRepository = userRepository;
+        _userProfileRepository = userProfileRepository;
         _passwordResetTokenRepository = passwordResetTokenRepository;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
@@ -66,17 +68,28 @@ public class AuthService : IAuthService
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Name = request.Name,
             Username = request.Username,
             Email = request.Email,
             PhoneNumber = request.PhoneNumber,
             PasswordHash = _passwordHasher.Hash(request.Password),
             Role = Role.User,
+            TargetLevelId = request.TargetLevelId,
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         };
 
         await _userRepository.CreateAsync(user);
+
+        var profile = new UserProfile
+        {
+            UserId = user.Id,
+            FullName = request.Name,
+            EstimatedBandScore = 0,
+            StreakDays = 0,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        await _userProfileRepository.CreateAsync(profile);
 
         var roleName = user.Role.ToString();
         var token = _jwtService.GenerateToken(user.Id, user.Username, user.Email, roleName);

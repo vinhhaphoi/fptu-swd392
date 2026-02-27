@@ -2,13 +2,13 @@ namespace Domain.Entities;
 
 public class LanguageCheck
 {
-    public int Id { get; set; }
-    public Guid SubmissionId { get; set; }
-    public int SpellingErrors { get; set; }
-    public int GrammarErrors { get; set; }
-    public int SyntaxErrors { get; set; }
-    public string? Feedback { get; set; }
-    public DateTime CheckedAt { get; set; } = DateTime.UtcNow;
+    public Guid Id { get; set; }
+    public Guid UserSubmissionId { get; set; }
+    public string CheckType { get; set; } = "Spelling/Grammar";
+    public string? AiModelVersion { get; set; }
+    public string? GrammarErrors { get; set; } // JSON format
+    public string? SpellingErrors { get; set; } // JSON format
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation properties
     public virtual UserSubmission? Submission { get; set; }

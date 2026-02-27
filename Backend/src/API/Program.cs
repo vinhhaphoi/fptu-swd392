@@ -108,6 +108,10 @@ builder.Services.AddScoped<ILearningService, LearningService>();
 builder.Services.AddScoped<IHintService, HintService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAIEvaluationService, AIEvaluationService>();
+builder.Services.AddScoped<IPracticeSessionService, PracticeSessionService>();
+builder.Services.AddScoped<IWritingService, WritingService>();
+builder.Services.AddScoped<IWritingSupportService, WritingSupportService>();
+builder.Services.AddScoped<ILearningPathService, LearningPathService>();
 
 // Dependency Injection - Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);

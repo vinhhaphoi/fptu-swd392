@@ -13,7 +13,7 @@ public class HintService : IHintService
         _hintRepository = hintRepository;
     }
 
-    public async Task<List<HintResponse>> GetHintsAsync(int topicId, int levelId)
+    public async Task<List<HintResponse>> GetHintsAsync(Guid topicId, int levelId)
     {
         var hints = await _hintRepository.GetByTopicAndLevelAsync(topicId, levelId);
         return hints.Select(h => new HintResponse

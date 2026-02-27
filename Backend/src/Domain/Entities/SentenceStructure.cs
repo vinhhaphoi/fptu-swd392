@@ -4,12 +4,13 @@ using System;
 
 public class SentenceStructure
 {
-    public int Id { get; set; }      // Kept as int to match structure_id in DB
-    public int VocabSetId { get; set; } // Matches vocab_set_id in DB
-    public string Pattern { get; set; } = string.Empty;
-    public string? UsageNote { get; set; }
-    public string? Example { get; set; }
+    public int Id { get; set; }
+    public Guid TopicId { get; set; }
+    public int LevelId { get; set; }
+    public string StructurePattern { get; set; } = string.Empty;
+    public string? Explanation { get; set; }
 
     // Navigation properties
-    public virtual VocabularySet? VocabularySet { get; set; }
+    public virtual Topic? Topic { get; set; }
+    public virtual Level? Level { get; set; }
 }

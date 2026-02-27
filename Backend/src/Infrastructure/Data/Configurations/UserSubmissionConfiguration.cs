@@ -8,59 +8,49 @@ namespace Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<UserSubmission> builder)
         {
-            builder.ToTable("user_submissions");
+            builder.ToTable("writing_submissions");
             
             builder.HasKey(e => e.Id);
-            builder.Property(e => e.Id).HasColumnName("submission_id");
 
-            builder.Property(e => e.SessionId)
-                   .HasColumnName("session_id")
+            builder.Property(e => e.PracticeSessionId)
+                   .HasColumnName("practice_session_id")
                    .IsRequired();
 
-            builder.Property(e => e.TopicId)
-                   .HasColumnName("topic_id")
+            builder.Property(e => e.VersionNumber)
+                   .HasColumnName("version_number")
+                   .HasDefaultValue(1)
                    .IsRequired();
 
-            builder.Property(e => e.PartId)
-                   .HasColumnName("part_id")
+            builder.Property(e => e.IsFinal)
+                   .HasColumnName("is_final")
+                   .HasDefaultValue(false)
                    .IsRequired();
 
-            builder.Property(e => e.Content)
-                   .HasColumnName("content")
+            builder.Property(e => e.SubmissionText)
+                   .HasColumnName("submission_text")
                    .IsRequired();
 
             builder.Property(e => e.WordCount)
-                   .HasColumnName("word_count");
-
-            builder.Property(e => e.EnableHint)
-                   .HasColumnName("enable_hint")
+                   .HasColumnName("word_count")
                    .IsRequired();
 
-            builder.Property(e => e.SubmittedAt)
-                   .HasColumnName("submitted_at")
+            builder.Property(e => e.WritingTimeSeconds)
+                   .HasColumnName("writing_time_seconds")
+                   .IsRequired();
+
+            builder.Property(e => e.CreatedAt)
+                   .HasColumnName("created_at")
                    .IsRequired();
 
             // Relationships
-            builder.HasOne(us => us.Session)
+            builder.HasOne(us => us.PracticeSession)
                    .WithMany(ps => ps.UserSubmissions)
-                   .HasForeignKey(us => us.SessionId)
+                   .HasForeignKey(us => us.PracticeSessionId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(us => us.Topic)
-                   .WithMany(t => t.UserSubmissions)
-                   .HasForeignKey(us => us.TopicId)
-                   .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(us => us.Part)
-                   .WithMany(p => p.UserSubmissions)
-                   .HasForeignKey(us => us.PartId)
-                   .OnDelete(DeleteBehavior.Restrict);
-
             // Indexes
-            builder.HasIndex(e => e.SessionId);
-            builder.HasIndex(e => e.TopicId);
-            builder.HasIndex(e => e.PartId);
-            builder.HasIndex(e => new { e.SessionId, e.TopicId });
+            builder.HasIndex(e => e.PracticeSessionId);
+            builder.HasIndex(e => new { e.PracticeSessionId, e.VersionNumber });
         }
     }
 }

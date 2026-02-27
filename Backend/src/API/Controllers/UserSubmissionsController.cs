@@ -31,35 +31,35 @@ public class UserSubmissionsController : ControllerBase
         return Guid.TryParse(claim, out var id) ? id : null;
     }
 
-    [HttpGet("by-session/{sessionId}")]
+    [HttpGet("by-session/{sessionId:guid}")]
     public async Task<IActionResult> GetBySession(Guid sessionId)
     {
         var session = await _sessionRepo.GetByIdAsync(sessionId);
         if (session == null) return NotFound();
         var userId = GetCurrentUserId();
         if (userId == null || userId != session.UserId) return Forbid();
-        return Ok(await _repo.GetBySessionIdAsync(sessionId));
+        return Ok(await _repo.GetByPracticeSessionIdAsync(sessionId));
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var item = await _repo.GetByIdAsync(id);
         if (item == null) return NotFound();
-        var session = await _sessionRepo.GetByIdAsync(item.SessionId);
+        var session = await _sessionRepo.GetByIdAsync(item.PracticeSessionId);
         if (session == null) return NotFound();
         var userId = GetCurrentUserId();
         if (userId == null || userId != session.UserId) return Forbid();
         return Ok(item);
     }
 
-    [HttpGet("{id}/evaluation")]
+    [HttpGet("{id:guid}/evaluation")]
     public async Task<IActionResult> GetEvaluation(Guid id)
     {
         var submission = await _repo.GetByIdAsync(id);
         if (submission == null) return NotFound();
         
-        var session = await _sessionRepo.GetByIdAsync(submission.SessionId);
+        var session = await _sessionRepo.GetByIdAsync(submission.PracticeSessionId);
         if (session == null) return NotFound();
         
         var userId = GetCurrentUserId();
@@ -79,18 +79,16 @@ public class UserSubmissionsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateUserSubmissionRequest request)
     {
-        var session = await _sessionRepo.GetByIdAsync(request.SessionId);
+        var session = await _sessionRepo.GetByIdAsync(request.PracticeSessionId);
         if (session == null) return NotFound("Session not found");
         var userId = GetCurrentUserId();
         if (userId == null || userId != session.UserId) return Forbid();
         var entity = new UserSubmission
         {
-            SessionId = request.SessionId,
-            TopicId = request.TopicId,
+            PracticeSessionId = request.PracticeSessionId,
             PartId = request.PartId,
-            Content = request.Content,
-            WordCount = request.WordCount ?? request.Content.Trim().Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Length,
-            EnableHint = request.EnableHint
+            SubmissionText = request.SubmissionText,
+            WordCount = request.WordCount ?? request.SubmissionText.Trim().Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Length
         };
         var created = await _repo.CreateAsync(entity);
         
@@ -103,10 +101,8 @@ public class UserSubmissionsController : ControllerBase
 
 public class CreateUserSubmissionRequest
 {
-    public Guid SessionId { get; set; }
-    public int TopicId { get; set; }
+    public Guid PracticeSessionId { get; set; }
     public int PartId { get; set; }
-    public string Content { get; set; } = string.Empty;
+    public string SubmissionText { get; set; } = string.Empty;
     public int? WordCount { get; set; }
-    public bool EnableHint { get; set; }
 }

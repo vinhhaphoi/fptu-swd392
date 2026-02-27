@@ -18,9 +18,10 @@ namespace Infrastructure.Data.Configurations
                    .HasMaxLength(5)
                    .IsRequired();
 
-            builder.Property(e => e.Description)
-                   .HasColumnName("description")
-                   .HasMaxLength(100);
+            builder.Property(e => e.Name)
+                   .HasColumnName("name")
+                   .HasMaxLength(100)
+                   .IsRequired();
 
             // Relationships
             builder.HasMany(l => l.Users)
@@ -29,8 +30,8 @@ namespace Infrastructure.Data.Configurations
                    .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasMany(l => l.Topics)
-                   .WithOne(t => t.DifficultyLevel)
-                   .HasForeignKey(t => t.DifficultyLevelId)
+                   .WithOne(t => t.Level)
+                   .HasForeignKey(t => t.LevelId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             // Indexes

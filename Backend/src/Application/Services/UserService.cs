@@ -13,19 +13,22 @@ public class UserService : IUserService
     private readonly IUserSubmissionRepository _submissionRepository;
     private readonly ILevelRepository _levelRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ILearningPathService _learningPathService;
 
     public UserService(
         IUserRepository userRepository,
         IPracticeSessionRepository sessionRepository,
         IUserSubmissionRepository submissionRepository,
         ILevelRepository levelRepository,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        ILearningPathService learningPathService)
     {
         _userRepository = userRepository;
         _sessionRepository = sessionRepository;
         _submissionRepository = submissionRepository;
         _levelRepository = levelRepository;
         _passwordHasher = passwordHasher;
+        _learningPathService = learningPathService;
     }
 
     public async Task<UserProfileResponse?> GetProfileByUsernameAsync(string username)
@@ -50,7 +53,16 @@ public class UserService : IUserService
 
         user.Name = request.Name;
         user.Email = request.Email;
+        user.Dob = request.Dob;
         user.TargetLevelId = request.TargetLevelId;
+
+        // Trigger learning plan generation if target level is updated or if no plan exists
+        var existingPlan = await _learningPathService.GetUserPlanAsync(userId);
+        if (existingPlan == null && user.TargetLevelId.HasValue)
+        {
+            await _learningPathService.GenerateInitialPlanAsync(userId, user.TargetLevelId.Value);
+        }
+
         user.UpdatedAt = DateTime.UtcNow;
         var updated = await _userRepository.UpdateAsync(user);
         return MapToProfile(updated);
@@ -64,6 +76,7 @@ public class UserService : IUserService
             Name = user.Name,
             Username = user.Username,
             Email = user.Email,
+            Dob = user.Dob,
             Role = user.Role,
             TargetLevelId = user.TargetLevelId,
             CreatedAt = user.CreatedAt,

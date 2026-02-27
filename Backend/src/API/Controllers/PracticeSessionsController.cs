@@ -46,8 +46,7 @@ public class PracticeSessionsController : ControllerBase
         var entity = new PracticeSession
         {
             UserId = userId.Value,
-            ModeId = request.ModeId,
-            IsRandom = request.IsRandom
+            PracticeModeId = request.PracticeModeId
         };
         var created = await _repo.CreateAsync(entity);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
@@ -56,6 +55,5 @@ public class PracticeSessionsController : ControllerBase
 
 public class CreatePracticeSessionRequest
 {
-    public int ModeId { get; set; }
-    public bool IsRandom { get; set; } = true;
+    public int PracticeModeId { get; set; }
 }

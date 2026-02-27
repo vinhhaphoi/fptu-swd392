@@ -11,10 +11,9 @@ public class SampleTextRepository : ISampleTextRepository
 
     public SampleTextRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<List<SampleText>> GetByTopicAndLevelAsync(int topicId, int levelId) =>
+    public async Task<List<SampleText>> GetByTopicAndLevelAsync(Guid topicId, int levelId) =>
         await _context.SampleTexts
             .AsNoTracking()
-            .Include(x => x.SampleType)
             .Where(x => x.TopicId == topicId && x.LevelId == levelId)
             .ToListAsync();
 

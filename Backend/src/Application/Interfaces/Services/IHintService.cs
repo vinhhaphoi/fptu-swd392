@@ -4,5 +4,5 @@ namespace Application.Interfaces.Services;
 
 public interface IHintService
 {
-    Task<List<HintResponse>> GetHintsAsync(int topicId, int levelId);
+    Task<List<HintResponse>> GetHintsAsync(Guid topicId, int levelId);
 }

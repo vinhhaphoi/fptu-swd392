@@ -4,6 +4,6 @@ namespace Application.Interfaces.Repositories;
 
 public interface IScoringCriteriaRepository
 {
-    Task<List<ScoringCriteria>> GetByPartIdAsync(int partId);
+    Task<List<ScoringCriteria>> GetByRubricIdAsync(Guid rubricId);
     Task<ScoringCriteria?> GetByIdAsync(int id);
 }

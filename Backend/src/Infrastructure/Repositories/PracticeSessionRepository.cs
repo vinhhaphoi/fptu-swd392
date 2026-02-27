@@ -22,4 +22,11 @@ public class PracticeSessionRepository : IPracticeSessionRepository
         await _context.SaveChangesAsync();
         return entity;
     }
+
+    public async Task<PracticeSession> UpdateAsync(PracticeSession entity)
+    {
+        _context.PracticeSessions.Update(entity);
+        await _context.SaveChangesAsync();
+        return entity;
+    }
 }

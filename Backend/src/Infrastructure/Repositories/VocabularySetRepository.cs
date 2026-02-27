@@ -11,18 +11,16 @@ public class VocabularySetRepository : IVocabularySetRepository
 
     public VocabularySetRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<List<VocabularySet>> GetByTopicAndLevelAsync(int topicId, int levelId) =>
+    public async Task<List<VocabularySet>> GetByTopicAndLevelAsync(Guid topicId, int levelId) =>
         await _context.VocabularySets
             .AsNoTracking()
             .Include(x => x.VocabularyItems)
-            .Include(x => x.SentenceStructures)
-            .Where(x => x.TopicId == topicId && x.LevelId == levelId)
+            .Where(x => x.LevelId == levelId && x.TopicVocabularySets.Any(tvs => tvs.TopicId == topicId))
             .ToListAsync();
 
     public async Task<VocabularySet?> GetByIdAsync(int id) => 
         await _context.VocabularySets
             .Include(x => x.VocabularyItems)
-            .Include(x => x.SentenceStructures)
             .FirstOrDefaultAsync(x => x.Id == id);
 
     public async Task<VocabularySet> CreateAsync(VocabularySet entity)

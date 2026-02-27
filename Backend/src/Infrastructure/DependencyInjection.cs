@@ -48,10 +48,22 @@ public static class DependencyInjection
         services.AddScoped<IVocabularySetRepository, VocabularySetRepository>();
         services.AddScoped<ISampleTextRepository, SampleTextRepository>();
         services.AddScoped<IHintRepository, HintRepository>();
-        services.AddScoped<IAIEvaluationRepository, AIEvaluationRepository>();
         services.AddScoped<ISystemPromptRepository, SystemPromptRepository>();
         services.AddScoped<IScoringCriteriaRepository, ScoringCriteriaRepository>();
         services.AddScoped<ILanguageCheckRepository, LanguageCheckRepository>();
+        
+        // New repositories
+        services.AddScoped<ISubmissionScoreRepository, SubmissionScoreRepository>();
+        services.AddScoped<ICriteriaScoreRepository, CriteriaScoreRepository>();
+        services.AddScoped<IAIFeedbackRepository, AIFeedbackRepository>();
+        services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+        services.AddScoped<IUserTopicProgressRepository, UserTopicProgressRepository>();
+        services.AddScoped<IExamAttemptRepository, ExamAttemptRepository>();
+        services.AddScoped<IRubricRepository, RubricRepository>();
+        services.AddScoped<ISentenceStructureRepository, SentenceStructureRepository>();
+        services.AddScoped<ITopicVocabularySetRepository, TopicVocabularySetRepository>();
+        services.AddScoped<IUserErrorStatisticRepository, UserErrorStatisticRepository>();
+        services.AddScoped<ILearningPlanRepository, LearningPlanRepository>();
 
         return services;
     }

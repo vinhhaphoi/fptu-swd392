@@ -14,7 +14,7 @@ public class TopicRepository : ITopicRepository
     public async Task<List<Topic>> GetByPartIdAsync(int partId) =>
         await _context.Topics.AsNoTracking().Where(x => x.PartId == partId).ToListAsync();
 
-    public async Task<Topic?> GetByIdAsync(int id) => await _context.Topics.FindAsync(id);
+    public async Task<Topic?> GetByIdAsync(Guid id) => await _context.Topics.FindAsync(id);
 
     public async Task<Topic> CreateAsync(Topic entity)
     {
@@ -30,7 +30,7 @@ public class TopicRepository : ITopicRepository
         return entity;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
         var e = await _context.Topics.FindAsync(id);
         if (e != null) { _context.Topics.Remove(e); await _context.SaveChangesAsync(); }

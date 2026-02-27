@@ -13,10 +13,9 @@ namespace Infrastructure.Data.Configurations
             builder.Property(e => e.Id).HasColumnName("sample_id");
             builder.Property(e => e.TopicId).HasColumnName("topic_id").IsRequired();
             builder.Property(e => e.LevelId).HasColumnName("level_id").IsRequired();
-            builder.Property(e => e.SampleTypeId).HasColumnName("sample_type_id").IsRequired();
             builder.Property(e => e.Content).HasColumnName("content").IsRequired();
-            builder.Property(e => e.Title).HasColumnName("title").HasMaxLength(200);
-            builder.Property(e => e.Author).HasColumnName("author").HasMaxLength(100);
+            builder.Property(e => e.SampleBandScore).HasColumnName("sample_band_score").IsRequired();
+            builder.Property(e => e.Version).HasColumnName("version").HasDefaultValue(1);
 
             builder.HasOne(e => e.Topic)
                    .WithMany(t => t.SampleTexts)
@@ -24,13 +23,8 @@ namespace Infrastructure.Data.Configurations
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(e => e.Level)
-                   .WithMany(l => l.SampleTexts)
+                   .WithMany()
                    .HasForeignKey(e => e.LevelId)
-                   .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(e => e.SampleType)
-                   .WithMany(st => st.SampleTexts)
-                   .HasForeignKey(e => e.SampleTypeId)
                    .OnDelete(DeleteBehavior.Restrict);
         }
     }

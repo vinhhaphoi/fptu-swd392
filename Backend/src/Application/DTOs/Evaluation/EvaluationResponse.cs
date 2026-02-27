@@ -5,26 +5,23 @@ public class CriteriaScoreDto
     public int CriteriaId { get; set; }
     public string CriteriaName { get; set; } = string.Empty;
     public float Score { get; set; }
-    public string? Feedback { get; set; }
+}
+
+public class AIFeedbackDto
+{
+    public int CriteriaId { get; set; }
+    public string? FeedbackText { get; set; }
+    public string? Suggestions { get; set; }
+    public string? ImprovedVersion { get; set; }
 }
 
 public class EvaluationResponse
 {
     public Guid SubmissionId { get; set; }
-    public float TotalScore { get; set; }
-    public string? EstimatedLevel { get; set; }
-    public string? OverallFeedback { get; set; }
-    public string? Strengths { get; set; }
-    public string? Weaknesses { get; set; }
-    public string? Suggestions { get; set; }
+    public float OverallScore { get; set; }
+    public string EstimatedBand { get; set; } = string.Empty;
+    public string? AiModelVersion { get; set; }
     public List<CriteriaScoreDto> CriteriaScores { get; set; } = new();
-    public LanguageCheckDto? LanguageCheck { get; set; }
-}
-
-public class LanguageCheckDto
-{
-    public int SpellingErrors { get; set; }
-    public int GrammarErrors { get; set; }
-    public int SyntaxErrors { get; set; }
-    public string? Feedback { get; set; }
+    public List<AIFeedbackDto> Feedbacks { get; set; } = new();
+    public DateTime CreatedAt { get; set; }
 }

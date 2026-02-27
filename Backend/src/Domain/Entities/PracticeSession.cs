@@ -1,19 +1,23 @@
-namespace Domain.Entities;
-
 using System;
+using Domain.Enums;
+
+namespace Domain.Entities;
 
 public class PracticeSession
 {
-    public Guid Id { get; set; }           // Changed from int to Guid to match session_id in DB
-    public Guid UserId { get; set; }       // Matches user_id in DB
-    public int ModeId { get; set; }        // Matches mode_id in DB
-    public bool IsRandom { get; set; } = true;
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public Guid? TopicId { get; set; }
+    public int? PracticeModeId { get; set; }
+    public Guid? ExamAttemptId { get; set; }
+    public WritingSessionStatus Status { get; set; } = WritingSessionStatus.InProgress;
     public DateTime StartedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? EndedAt { get; set; }
-    public string? Status { get; set; }
+    public DateTime? SubmittedAt { get; set; }
 
     // Navigation properties
     public virtual User? User { get; set; }
-    public virtual PracticeMode? Mode { get; set; }
+    public virtual Topic? Topic { get; set; }
+    public virtual PracticeMode? PracticeMode { get; set; }
+    public virtual ExamAttempt? ExamAttempt { get; set; }
     public virtual ICollection<UserSubmission> UserSubmissions { get; set; } = new List<UserSubmission>();
 }

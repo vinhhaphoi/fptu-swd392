@@ -24,8 +24,8 @@ namespace Infrastructure.Data.Configurations
 
             // Relationships
             builder.HasMany(pm => pm.PracticeSessions)
-                   .WithOne(ps => ps.Mode)
-                   .HasForeignKey(ps => ps.ModeId)
+                   .WithOne(ps => ps.PracticeMode)
+                   .HasForeignKey(ps => ps.PracticeModeId)
                    .OnDelete(DeleteBehavior.Cascade);
 
             // Indexes
