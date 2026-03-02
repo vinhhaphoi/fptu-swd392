@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/components/ui/Button";
-import { db } from "@/lib/firebase";
+import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { SKILLS_DATA } from "@/types";
 import { doc, serverTimestamp, writeBatch } from "firebase/firestore";
 import { useState } from "react";
@@ -11,6 +11,12 @@ export default function SeedPage() {
   const [loading, setLoading] = useState(false);
 
   const seedData = async () => {
+    if (!isFirebaseEnabled || !db) {
+      setStatus(
+        "Firebase is not configured. Add NEXT_PUBLIC_FIREBASE_API_KEY (and other NEXT_PUBLIC_FIREBASE_*) to .env.local to use this feature."
+      );
+      return;
+    }
     setLoading(true);
     setStatus("Seeding...");
     try {
@@ -158,9 +164,10 @@ export default function SeedPage() {
           fullWidth
           onClick={seedData}
           loading={loading}
+          disabled={!isFirebaseEnabled}
           className="rounded-2xl py-4"
         >
-          Push Data to Firebase
+          {isFirebaseEnabled ? "Push Data to Firebase" : "Firebase not configured"}
         </Button>
         {status && (
           <div

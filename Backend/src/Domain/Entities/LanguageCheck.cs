@@ -2,8 +2,8 @@ namespace Domain.Entities;
 
 public class LanguageCheck
 {
-    public Guid Id { get; set; }
-    public Guid UserSubmissionId { get; set; }
+    public int Id { get; set; }
+    public int UserSubmissionId { get; set; }
     public string CheckType { get; set; } = "Spelling/Grammar";
     public string? AiModelVersion { get; set; }
     public string? GrammarErrors { get; set; } // JSON format

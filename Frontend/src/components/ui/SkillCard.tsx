@@ -13,9 +13,11 @@ export default function SkillCard({
   testsCompleted = 0,
 }: SkillCardProps) {
   const data = SKILLS_DATA[skill];
+  // Writing skill → trang luyện essay với AI chấm điểm
+  const href = skill === "writing" ? "/writing" : `/practice/${skill}`;
 
   return (
-    <Link href={`/practice/${skill}`}>
+    <Link href={href}>
       <div className="group relative overflow-hidden bg-card backdrop-blur-sm border border-card-border rounded-2xl p-6 hover:border-indigo-500/30 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-indigo-500/10">
         {/* Background gradient */}
         <div

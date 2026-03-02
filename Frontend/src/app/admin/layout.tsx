@@ -13,7 +13,7 @@ function AdminSidebar() {
     { href: "/admin/stats", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/users", label: "User Management", icon: Users },
     { href: "/admin/features", label: "App Features", icon: Settings },
-    { href: "/admin/questions", label: "Question Bank", icon: Database },
+    { href: "/admin/questions", label: "Tạo bộ đề (Upload)", icon: Database },
   ];
 
   return (

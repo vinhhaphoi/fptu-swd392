@@ -42,7 +42,7 @@ public class AIEvaluationService : IAIEvaluationService
         _learningPathService = learningPathService;
     }
 
-    public async Task<EvaluationResponse> EvaluateSubmissionAsync(Guid submissionId)
+    public async Task<EvaluationResponse> EvaluateSubmissionAsync(int submissionId)
     {
         var submission = await _submissionRepository.GetByIdAsync(submissionId);
         if (submission == null) throw new InvalidOperationException("Submission not found");
@@ -171,7 +171,7 @@ public class AIEvaluationService : IAIEvaluationService
         };
     }
 
-    public async Task<EvaluationResponse?> GetEvaluationResultAsync(Guid submissionId)
+    public async Task<EvaluationResponse?> GetEvaluationResultAsync(int submissionId)
     {
         var submissionScore = await _scoreRepository.GetBySubmissionIdAsync(submissionId);
         if (submissionScore == null) return null;

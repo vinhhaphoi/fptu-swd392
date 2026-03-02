@@ -5,6 +5,6 @@ namespace Application.Interfaces.Services;
 public interface IWritingService
 {
     Task<UserSubmissionResponse> SaveSubmissionAsync(SaveSubmissionRequest request);
-    Task<List<UserSubmissionResponse>> GetSubmissionHistoryAsync(Guid practiceSessionId);
-    Task<UserSubmissionResponse?> GetLatestSubmissionAsync(Guid practiceSessionId);
+    Task<List<UserSubmissionResponse>> GetSubmissionHistoryAsync(int practiceSessionId);
+    Task<UserSubmissionResponse?> GetLatestSubmissionAsync(int practiceSessionId);
 }

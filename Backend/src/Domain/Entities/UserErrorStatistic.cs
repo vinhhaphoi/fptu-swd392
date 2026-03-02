@@ -5,7 +5,7 @@ namespace Domain.Entities;
 public class UserErrorStatistic
 {
     public Guid Id { get; set; }
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public int CriteriaId { get; set; }
     public int PartId { get; set; }
     public int LevelId { get; set; }

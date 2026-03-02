@@ -1,6 +1,7 @@
 "use client";
 
 import SkillCard from "@/components/ui/SkillCard";
+import SupabaseTest from "@/components/SupabaseTest";
 import { useAppContent } from "@/hooks/useRealTime";
 import Link from "next/link";
 
@@ -97,6 +98,12 @@ export default function Home() {
                 className="w-full sm:w-auto px-8 py-4 rounded-xl border-2 border-foreground/10 text-foreground font-semibold text-lg hover:bg-foreground/5 transition-all duration-300"
               >
                 Explore Tests
+              </Link>
+              <Link
+                href="/writing"
+                className="w-full sm:w-auto px-8 py-4 rounded-xl border-2 border-purple-500/30 text-purple-500 dark:text-purple-400 font-semibold text-lg hover:bg-purple-500/10 transition-all duration-300"
+              >
+                ✍️ Writing Practice
               </Link>
             </div>
 

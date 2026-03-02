@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,10 +21,15 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await signIn(email, password);
+      await signIn(identifier, password);
       router.push("/practice");
     } catch (err: unknown) {
-      setError("Failed to sign in. Please check your credentials.");
+      console.error("Sign in error:", err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Đăng nhập thất bại. Vui lòng thử lại.");
+      }
     } finally {
       setLoading(false);
     }
@@ -38,7 +43,12 @@ export default function LoginPage() {
       await signInWithGoogle();
       router.push("/practice");
     } catch (err: unknown) {
-      setError("Failed to sign in with Google.");
+      console.error("Google sign in error:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Không thể đăng nhập bằng Google.",
+      );
     } finally {
       setLoading(false);
     }
@@ -96,17 +106,17 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="text-xs font-semibold text-foreground/40 uppercase tracking-wider ml-1">
-                Email Address
+                Email or Username
               </label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/20 group-focus-within:text-indigo-500 transition-colors">
                   <Mail size={18} />
                 </div>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder="name@example.com or username"
                   className="w-full pl-12 pr-4 py-4 rounded-2xl bg-background/50 border border-card-border focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all placeholder:text-foreground/20"
                   required
                 />

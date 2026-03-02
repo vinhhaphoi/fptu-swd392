@@ -1,0 +1,48 @@
+rules_version = '2';
+// Firestore Security Rules
+// Auth bằng Backend (JWT), không dùng Firebase Auth → request.auth luôn null.
+// Để app đọc/ghi được, cần mở quyền cho các collection dưới đây.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Nội dung app (stats, features)
+    match /app_content/{document=**} {
+      allow read, write: if true;
+    }
+
+    // Kỹ năng (skills metadata)
+    match /skills/{document=**} {
+      allow read, write: if true;
+    }
+
+    // Đề thi & câu hỏi
+    match /tests/{document=**} {
+      allow read, write: if true;
+    }
+    match /questions/{document=**} {
+      allow read, write: if true;
+    }
+
+    // Bộ đề (upload từ admin)
+    match /examSets/{document=**} {
+      allow read, write: if true;
+    }
+
+    // Kết quả làm bài & tiến độ (db.ts dùng "results", "user_progress")
+    match /results/{document=**} {
+      allow read, write: if true;
+    }
+    match /user_progress/{document=**} {
+      allow read, write: if true;
+    }
+    match /progress/{document=**} {
+      allow read, write: if true;
+    }
+
+    // Users (sync từ Backend hoặc admin)
+    match /users/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

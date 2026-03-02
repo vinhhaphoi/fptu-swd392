@@ -4,8 +4,8 @@ using System;
 
 public class UserSubmission
 {
-    public Guid Id { get; set; }
-    public Guid PracticeSessionId { get; set; }
+    public int Id { get; set; }
+    public int PracticeSessionId { get; set; }
     public int? PartId { get; set; }
     public int VersionNumber { get; set; }
     public bool IsFinal { get; set; }

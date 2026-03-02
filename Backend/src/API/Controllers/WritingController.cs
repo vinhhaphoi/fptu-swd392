@@ -39,7 +39,7 @@ public class WritingController : ControllerBase
     public async Task<IActionResult> StartSession([FromBody] StartSessionRequest request)
     {
         var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
             return Unauthorized();
 
         var session = await _sessionService.StartSessionAsync(userId, request);

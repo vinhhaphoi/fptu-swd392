@@ -28,6 +28,7 @@ export default function Header() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/practice", label: "Practice" },
+    { href: "/writing", label: "Writing" },
     { href: "/mock-exam", label: "Mock Exam" },
     { href: "/results", label: "My Results" },
   ];

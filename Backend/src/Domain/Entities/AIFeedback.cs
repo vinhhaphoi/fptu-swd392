@@ -5,7 +5,7 @@ namespace Domain.Entities;
 public class AIFeedback
 {
     public Guid Id { get; set; }
-    public Guid SubmissionId { get; set; }
+    public int SubmissionId { get; set; }
     public int CriteriaId { get; set; } // Matches ScoringCriteria.Id
     public string? FeedbackText { get; set; }
     public string? Suggestions { get; set; }

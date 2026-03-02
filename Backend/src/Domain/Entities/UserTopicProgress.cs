@@ -5,7 +5,7 @@ namespace Domain.Entities;
 public class UserTopicProgress
 {
     public Guid Id { get; set; }
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public Guid TopicId { get; set; }
     public int AttemptsCount { get; set; }
     public string BestBandScore { get; set; } = "0.0";

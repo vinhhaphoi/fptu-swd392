@@ -46,7 +46,12 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await signUp(formData.email, formData.password, formData.name);
+      await signUp(
+        formData.email,
+        formData.password,
+        formData.name,
+        formData.targetLevel,
+      );
       router.push("/practice");
     } catch (err: unknown) {
       setError(

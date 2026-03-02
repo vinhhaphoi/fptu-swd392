@@ -14,10 +14,10 @@ public class PracticeSessionsController : ControllerBase
 
     public PracticeSessionsController(IPracticeSessionRepository repo) => _repo = repo;
 
-    private Guid? GetCurrentUserId()
+    private int? GetCurrentUserId()
     {
         var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(claim, out var id) ? id : null;
+        return int.TryParse(claim, out var id) ? id : null;
     }
 
     [HttpGet("my")]
@@ -28,8 +28,8 @@ public class PracticeSessionsController : ControllerBase
         return Ok(await _repo.GetByUserIdAsync(userId.Value));
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id)
     {
         var item = await _repo.GetByIdAsync(id);
         if (item == null) return NotFound();

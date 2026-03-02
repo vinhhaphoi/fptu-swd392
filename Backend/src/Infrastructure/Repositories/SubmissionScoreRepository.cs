@@ -14,7 +14,7 @@ public class SubmissionScoreRepository : ISubmissionScoreRepository
         _context = context;
     }
 
-    public async Task<SubmissionScore?> GetBySubmissionIdAsync(Guid submissionId)
+    public async Task<SubmissionScore?> GetBySubmissionIdAsync(int submissionId)
     {
         return await _context.SubmissionScores
             .Include(ss => ss.CriteriaScores)
