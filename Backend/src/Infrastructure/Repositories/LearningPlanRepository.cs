@@ -11,7 +11,7 @@ public class LearningPlanRepository : ILearningPlanRepository
 
     public LearningPlanRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<LearningPlan?> GetByUserIdAsync(Guid userId) =>
+    public async Task<LearningPlan?> GetByUserIdAsync(int userId) =>
         await _context.Set<LearningPlan>()
             .Include(p => p.TargetLevel)
             .FirstOrDefaultAsync(x => x.UserId == userId);

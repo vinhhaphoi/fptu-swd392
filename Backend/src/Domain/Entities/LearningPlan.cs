@@ -5,7 +5,7 @@ using System;
 public class LearningPlan
 {
     public Guid Id { get; set; }
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
     public int TargetLevelId { get; set; }
     public int TotalRequiredSessions { get; set; }
     public int CompletedSessions { get; set; }

@@ -16,7 +16,7 @@ public class JwtService : IJwtService
         _configuration = configuration;
     }
 
-    public string GenerateToken(Guid userId, string username, string email, string role)
+    public string GenerateToken(int userId, string username, string email, string role)
     {
         var secretKey = _configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey is required");
         var issuer = _configuration["Jwt:Issuer"] ?? "VSTEP.Backend";

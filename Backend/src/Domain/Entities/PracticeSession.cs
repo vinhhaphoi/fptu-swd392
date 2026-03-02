@@ -5,8 +5,8 @@ namespace Domain.Entities;
 
 public class PracticeSession
 {
-    public Guid Id { get; set; }
-    public Guid UserId { get; set; }
+    public int Id { get; set; }
+    public int UserId { get; set; }
     public Guid? TopicId { get; set; }
     public int? PracticeModeId { get; set; }
     public Guid? ExamAttemptId { get; set; }

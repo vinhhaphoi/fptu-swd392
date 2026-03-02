@@ -21,7 +21,6 @@ public class WritingService : IWritingService
 
         var submission = new UserSubmission
         {
-            Id = Guid.NewGuid(),
             PracticeSessionId = request.PracticeSessionId,
             VersionNumber = nextVersion,
             IsFinal = request.IsFinal,
@@ -36,13 +35,13 @@ public class WritingService : IWritingService
         return MapToResponse(submission);
     }
 
-    public async Task<List<UserSubmissionResponse>> GetSubmissionHistoryAsync(Guid practiceSessionId)
+    public async Task<List<UserSubmissionResponse>> GetSubmissionHistoryAsync(int practiceSessionId)
     {
         var history = await _submissionRepository.GetByPracticeSessionIdAsync(practiceSessionId);
         return history.OrderByDescending(s => s.VersionNumber).Select(MapToResponse).ToList();
     }
 
-    public async Task<UserSubmissionResponse?> GetLatestSubmissionAsync(Guid practiceSessionId)
+    public async Task<UserSubmissionResponse?> GetLatestSubmissionAsync(int practiceSessionId)
     {
         var latest = await _submissionRepository.GetLatestVersionAsync(practiceSessionId);
         return latest != null ? MapToResponse(latest) : null;

@@ -1,15 +1,14 @@
 "use client";
 
 import {
-  signOut as authSignOut,
-  onAuthChange,
-  signIn,
-  signInWithGoogle,
-  signUp,
+  AuthUser,
+  backendLogin,
+  backendRegister,
+  fetchCurrentProfile,
+  signOutBackend,
+  UserProfile,
 } from "@/lib/auth";
-import { subscribeToUser, updateLastLogin } from "@/lib/db";
-import { User as DbUser } from "@/types";
-import { User as FirebaseUser } from "firebase/auth";
+import { getStoredToken } from "@/lib/apiClient";
 import {
   createContext,
   ReactNode,
@@ -19,16 +18,17 @@ import {
 } from "react";
 
 interface AuthContextType {
-  user: FirebaseUser | null;
-  userData: DbUser | null;
+  user: AuthUser | null;
+  userData: UserProfile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<FirebaseUser>;
+  signIn: (identifier: string, password: string) => Promise<AuthUser>;
   signUp: (
     email: string,
     password: string,
     displayName: string,
-  ) => Promise<FirebaseUser>;
-  signInWithGoogle: () => Promise<FirebaseUser>;
+    targetLevelCode?: string,
+  ) => Promise<AuthUser>;
+  signInWithGoogle: () => Promise<AuthUser>;
   signOut: () => Promise<void>;
   isAdmin: boolean;
   isModerator: boolean;
@@ -38,58 +38,93 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [userData, setUserData] = useState<DbUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [userData, setUserData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   const handleSignOut = async () => {
-    await authSignOut();
+    await signOutBackend();
     setUser(null);
     setUserData(null);
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthChange((user) => {
-      setUser(user);
-      if (!user) {
-        setUserData(null);
+    const init = async () => {
+      try {
+        const token = getStoredToken();
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        const profile = await fetchCurrentProfile();
+        const mappedUser: AuthUser = {
+          uid: profile.id,
+          email: profile.email,
+          displayName: profile.name,
+        };
+
+        setUser(mappedUser);
+        setUserData(profile);
+      } catch (err) {
+        console.error("Failed to restore auth session:", err);
+        await handleSignOut();
+      } finally {
         setLoading(false);
       }
-    });
-
-    return () => unsubscribe();
+    }
+    void init();
   }, []);
 
   useEffect(() => {
-    if (user?.uid) {
-      updateLastLogin(user.uid);
-      const unsubscribe = subscribeToUser(user.uid, (data) => {
-        setUserData(data as DbUser);
-        setLoading(false);
-      });
-      return () => unsubscribe();
+    if (userData && !userData.isActive) {
+      void handleSignOut();
     }
-  }, [user]);
+  }, [userData]);
 
-  useEffect(() => {
-    if (userData?.isBlocked) {
-      setTimeout(() => {
-        handleSignOut();
-      }, 0);
-    }
-  }, [userData?.isBlocked]);
+  const handleSignIn = async (
+    identifier: string,
+    password: string,
+  ): Promise<AuthUser> => {
+    const { user: authUser, profile } = await backendLogin(identifier, password);
+    setUser(authUser);
+    setUserData(profile);
+    return authUser;
+  };
+
+  const handleSignUp = async (
+    email: string,
+    password: string,
+    displayName: string,
+    targetLevelCode: string = "B2",
+  ): Promise<AuthUser> => {
+    const { user: authUser, profile } = await backendRegister(
+      email,
+      password,
+      displayName,
+      targetLevelCode,
+    );
+    setUser(authUser);
+    setUserData(profile);
+    return authUser;
+  };
+
+  const handleSignInWithGoogle = async (): Promise<AuthUser> => {
+    throw new Error("Google sign-in is not supported in backend auth mode.");
+  };
 
   const value: AuthContextType = {
     user,
     userData,
     loading,
-    signIn,
-    signUp,
-    signInWithGoogle,
+    signIn: handleSignIn,
+    signUp: handleSignUp,
+    signInWithGoogle: handleSignInWithGoogle,
     signOut: handleSignOut,
-    isAdmin: userData?.role === "admin",
-    isModerator: userData?.role === "admin" || userData?.role === "moderator",
-    isBlocked: !!userData?.isBlocked,
+    isAdmin: userData?.role === "Admin",
+    isModerator:
+      userData?.role === "Admin" || userData?.role === "Manager",
+    isBlocked: userData ? !userData.isActive : false,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

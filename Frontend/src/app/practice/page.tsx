@@ -4,10 +4,11 @@ import SkillCard from "@/components/ui/SkillCard";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppContent, useUserStatus } from "@/hooks/useRealTime";
 import { LEVELS, SkillType } from "@/types";
+import { FileUp } from "lucide-react";
 import Link from "next/link";
 
 export default function PracticePage() {
-  const { user } = useAuth();
+  const { user, isModerator } = useAuth();
   const { skills, loading: contentLoading } = useAppContent();
   const { progress, loading: progressLoading } = useUserStatus(
     user?.uid || null,
@@ -63,6 +64,31 @@ export default function PracticePage() {
               />
             ))}
           </div>
+        )}
+
+        {/* Tạo bộ đề - Admin only */}
+        {isModerator && (
+          <Link
+            href="/admin/questions"
+            className="block mb-8 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-2xl p-6 hover:border-indigo-500/40 transition-all group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-500/30">
+                  <FileUp size={24} />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-bold text-foreground">Tạo bộ đề từ tài liệu</h3>
+                  <p className="text-sm text-foreground/60">
+                    Upload PDF/DOCX/TXT → AI trích xuất → Chỉnh sửa → Lưu Firestore
+                  </p>
+                </div>
+              </div>
+              <span className="text-indigo-500 font-medium group-hover:underline">
+                Vào trang tạo đề →
+              </span>
+            </div>
+          </Link>
         )}
 
         {/* Mock Exam CTA */}

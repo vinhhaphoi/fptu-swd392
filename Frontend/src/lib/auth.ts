@@ -1,101 +1,121 @@
-import {
-    createUserWithEmailAndPassword,
-    signOut as firebaseSignOut,
-    GoogleAuthProvider,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    signInWithPopup,
-    updateProfile,
-    User,
-} from "firebase/auth";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
-import { auth, db } from "./firebase";
+import { apiFetch, clearStoredToken, setStoredToken } from "./apiClient";
 
-// Google Auth Provider
-const googleProvider = new GoogleAuthProvider();
+/**
+ * Auth bằng Backend (JWT). Tài khoản lưu trong bảng profile trên Backend.
+ * Frontend gọi API login/register → nhận token → gọi /api/user/profile để lấy UserProfile.
+ */
 
-// Sign up with email and password
-export async function signUp(email: string, password: string, displayName: string) {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    // Use a default avatar if none exists
-    const photoURL = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=6366f1&color=fff`;
-
-    // Update Firebase Auth profile
-    await updateProfile(user, {
-        displayName,
-        photoURL
-    });
-
-    // Create/Update user document in Firestore
-    await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        email: user.email,
-        displayName: displayName,
-        photoURL: photoURL,
-        lastLogin: serverTimestamp(),
-        createdAt: serverTimestamp(),
-        targetLevel: "B2",
-        role: "member",
-    }, { merge: true });
-
-    return user;
+export interface AuthResponse {
+  token: string;
+  userId: string;
+  username: string;
+  email: string;
+  role: string;
+  expiresAt: string;
 }
 
-// Sign in with email and password
-export async function signIn(email: string, password: string) {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-
-    // Update last login
-    await setDoc(doc(db, "users", userCredential.user.uid), {
-        lastLogin: serverTimestamp(),
-    }, { merge: true });
-
-    return userCredential.user;
+export interface UserProfile {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  role: string;
+  targetLevelId?: number;
+  targetLevelName?: string;
+  createdAt: string;
+  updatedAt?: string;
+  isActive: boolean;
 }
 
-// Sign in with Google
-export async function signInWithGoogle() {
-    const result = await signInWithPopup(auth, googleProvider);
-    const user = result.user;
-
-    // Always update Firestore with latest info from Google
-    await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-        photoURL: user.photoURL,
-        lastLogin: serverTimestamp(),
-        // Only set createdAt if it doesn't exist
-        updatedAt: serverTimestamp(),
-    }, { merge: true });
-
-    // Ensure createdAt and role exist
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    const userData = userDoc.data();
-    if (!userData?.createdAt || !userData?.role) {
-        await setDoc(doc(db, "users", user.uid), {
-            createdAt: userData?.createdAt || serverTimestamp(),
-            targetLevel: userData?.targetLevel || "B2",
-            role: userData?.role || "member",
-        }, { merge: true });
-    }
-
-    return user;
+// Minimal user shape used by the frontend
+export interface AuthUser {
+  uid: string;
+  email: string;
+  displayName: string;
 }
 
-// Sign out
-export async function signOut() {
-    await firebaseSignOut(auth);
+const LEVEL_CODE_TO_ID: Record<string, number> = {
+  A1: 1,
+  A2: 2,
+  B1: 3,
+  B2: 4,
+  C1: 5,
+  C2: 6,
+};
+
+function mapAuthResponseToUser(
+  auth: AuthResponse,
+  profile?: UserProfile,
+): AuthUser {
+  return {
+    uid: auth.userId,
+    email: auth.email,
+    displayName: profile?.name || auth.username,
+  };
 }
 
-// Auth state observer
-export function onAuthChange(callback: (user: User | null) => void) {
-    return onAuthStateChanged(auth, callback);
+export async function backendLogin(
+  identifier: string,
+  password: string,
+): Promise<{ auth: AuthResponse; profile: UserProfile; user: AuthUser }> {
+  const auth = await apiFetch<AuthResponse>("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({
+      username: identifier,
+      password,
+    }),
+  });
+
+  setStoredToken(auth.token);
+
+  const profile = await apiFetch<UserProfile>("/api/user/profile", {}, true);
+
+  return { auth, profile, user: mapAuthResponseToUser(auth, profile) };
 }
 
-// Get current user
-export function getCurrentUser() {
-    return auth.currentUser;
+export async function backendRegister(
+  email: string,
+  password: string,
+  name: string,
+  targetLevelCode: string = "B2",
+): Promise<{ auth: AuthResponse; profile: UserProfile; user: AuthUser }> {
+  const targetLevelId = LEVEL_CODE_TO_ID[targetLevelCode] ?? LEVEL_CODE_TO_ID.B2;
+  // Derive a backend-friendly username from email local-part
+  const emailLocalPart = email.split("@")[0] ?? "user";
+  let username = emailLocalPart.toLowerCase().replace(/[^a-zA-Z0-9_-]/g, "_");
+  // Collapse multiple underscores and trim from ends
+  username = username.replace(/_{2,}/g, "_").replace(/^_+|_+$/g, "");
+  if (username.length < 3) {
+    username = `user_${Date.now()}`;
+  }
+  if (username.length > 50) {
+    username = username.slice(0, 50);
+  }
+
+  const auth = await apiFetch<AuthResponse>("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify({
+      name,
+      username,
+      email,
+      phoneNumber: null,
+      password,
+      targetLevelId,
+    }),
+  });
+
+  setStoredToken(auth.token);
+
+  const profile = await apiFetch<UserProfile>("/api/user/profile", {}, true);
+
+  return { auth, profile, user: mapAuthResponseToUser(auth, profile) };
 }
+
+export async function fetchCurrentProfile(): Promise<UserProfile> {
+  return apiFetch<UserProfile>("/api/user/profile", {}, true);
+}
+
+export async function signOutBackend() {
+  clearStoredToken();
+}
+

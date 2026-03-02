@@ -19,7 +19,7 @@ public class WritingSupportService : IWritingSupportService
         _sentenceStructureRepository = sentenceStructureRepository;
     }
 
-    public async Task<LanguageCheckResponse> CheckLanguageAsync(Guid submissionId, string text)
+    public async Task<LanguageCheckResponse> CheckLanguageAsync(int submissionId, string text)
     {
         // In a real implementation, this would call an AI service.
         // For now, we mock some results and save them.
@@ -29,7 +29,6 @@ public class WritingSupportService : IWritingSupportService
 
         var check = new LanguageCheck
         {
-            Id = Guid.NewGuid(),
             UserSubmissionId = submissionId,
             CheckType = "REAL_TIME",
             AiModelVersion = "gpt-4-turbo",

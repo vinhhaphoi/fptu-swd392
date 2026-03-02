@@ -18,6 +18,13 @@ namespace Infrastructure.Data.Configurations
                    .HasMaxLength(5)
                    .IsRequired();
 
+            // Optional band score range columns
+            builder.Property(e => e.BandScoreMin)
+                   .HasColumnName("band_score_min");
+
+            builder.Property(e => e.BandScoreMax)
+                   .HasColumnName("band_score_max");
+
             builder.Property(e => e.Name)
                    .HasColumnName("name")
                    .HasMaxLength(100)

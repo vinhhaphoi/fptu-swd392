@@ -22,7 +22,7 @@ public class PracticeSessionService : IPracticeSessionService
         _examAttemptRepository = examAttemptRepository;
     }
 
-    public async Task<PracticeSessionResponse> StartSessionAsync(Guid userId, StartSessionRequest request)
+    public async Task<PracticeSessionResponse> StartSessionAsync(int userId, StartSessionRequest request)
     {
         var mode = await _modeRepository.GetByIdAsync(request.PracticeModeId);
         if (mode == null) throw new InvalidOperationException("Invalid practice mode");
@@ -47,7 +47,6 @@ public class PracticeSessionService : IPracticeSessionService
 
         var session = new PracticeSession
         {
-            Id = Guid.NewGuid(),
             UserId = userId,
             PracticeModeId = request.PracticeModeId,
             TopicId = request.TopicId,
@@ -70,7 +69,7 @@ public class PracticeSessionService : IPracticeSessionService
         };
     }
 
-    public async Task<PracticeSessionResponse> GetSessionAsync(Guid sessionId)
+    public async Task<PracticeSessionResponse> GetSessionAsync(int sessionId)
     {
         var session = await _sessionRepository.GetByIdAsync(sessionId);
         if (session == null) throw new InvalidOperationException("Session not found");
@@ -87,7 +86,7 @@ public class PracticeSessionService : IPracticeSessionService
         };
     }
 
-    public async Task<bool> EndSessionAsync(Guid sessionId)
+    public async Task<bool> EndSessionAsync(int sessionId)
     {
         var session = await _sessionRepository.GetByIdAsync(sessionId);
         if (session == null) return false;

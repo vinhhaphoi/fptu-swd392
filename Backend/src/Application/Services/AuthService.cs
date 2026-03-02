@@ -67,13 +67,14 @@ public class AuthService : IAuthService
     {
         var user = new User
         {
-            Id = Guid.NewGuid(),
+            Name = request.Name,
             Username = request.Username,
             Email = request.Email,
             PhoneNumber = request.PhoneNumber,
             PasswordHash = _passwordHasher.Hash(request.Password),
             Role = Role.User,
-            TargetLevelId = request.TargetLevelId,
+            // Temporarily ignore target level during registration to avoid FK issues when levels table is empty
+            TargetLevelId = null,
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         };
@@ -149,7 +150,7 @@ public class AuthService : IAuthService
         await _passwordResetTokenRepository.UpdateAsync(resetToken);
     }
 
-    public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request)
+    public async Task ChangePasswordAsync(int userId, ChangePasswordRequest request)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null)

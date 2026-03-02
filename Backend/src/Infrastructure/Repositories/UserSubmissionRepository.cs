@@ -11,17 +11,17 @@ public class UserSubmissionRepository : IUserSubmissionRepository
 
     public UserSubmissionRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<List<UserSubmission>> GetByPracticeSessionIdAsync(Guid practiceSessionId) =>
+    public async Task<List<UserSubmission>> GetByPracticeSessionIdAsync(int practiceSessionId) =>
         await _context.UserSubmissions.AsNoTracking().Where(x => x.PracticeSessionId == practiceSessionId).OrderByDescending(x => x.SubmittedAt).ToListAsync();
 
-    public async Task<UserSubmission?> GetLatestVersionAsync(Guid practiceSessionId) =>
+    public async Task<UserSubmission?> GetLatestVersionAsync(int practiceSessionId) =>
         await _context.UserSubmissions
             .AsNoTracking()
             .Where(x => x.PracticeSessionId == practiceSessionId)
             .OrderByDescending(x => x.VersionNumber)
             .FirstOrDefaultAsync();
 
-    public async Task<List<UserSubmission>> GetByUserIdAsync(Guid userId) =>
+    public async Task<List<UserSubmission>> GetByUserIdAsync(int userId) =>
         await _context.UserSubmissions
             .AsNoTracking()
             .Include(x => x.PracticeSession)
@@ -33,7 +33,7 @@ public class UserSubmissionRepository : IUserSubmissionRepository
             .OrderByDescending(x => x.SubmittedAt)
             .ToListAsync();
 
-    public async Task<UserSubmission?> GetByIdAsync(Guid id) => await _context.UserSubmissions.FindAsync(id);
+    public async Task<UserSubmission?> GetByIdAsync(int id) => await _context.UserSubmissions.FindAsync(id);
 
     public async Task<UserSubmission> CreateAsync(UserSubmission entity)
     {
