@@ -22,14 +22,17 @@ public class WritingController : ControllerBase
         _topicRepository = topicRepository;
     }
 
+    /// <summary>
+    /// Danh sách topic dùng cho màn hình writing/practice. Chỉ trả về topic đang active.
+    /// </summary>
+    /// <param name="level">LevelId (optional) - lọc theo level, ví dụ 1=A1, 2=A2...</param>
+    /// <param name="part">PartId (optional) - lọc theo part, ví dụ 1=Task1, 2=Task2</param>
     [HttpGet("topics")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetTopics([FromQuery] int? level)
+    public async Task<IActionResult> GetTopics([FromQuery] int? level, [FromQuery] int? part)
     {
-        // Currently ITopicService doesn't have a filtered GetTopics method in its interface, 
-        // but we'll implement the logic here or update the service.
-        // Placeholder for now.
-        return Ok(new { message = "Topic filtering implementation pending service update", level });
+        var list = await _topicRepository.GetActiveTopicsAsync(part, level);
+        return Ok(list);
     }
 
     [HttpPost("session/start")]

@@ -10,7 +10,7 @@ public class Level
     public int BandScoreMin { get; set; }
     public int BandScoreMax { get; set; }
 
-    // Navigation properties
+    // Navigation properties    
     public virtual ICollection<User> Users { get; set; } = new List<User>();
     public virtual ICollection<Topic> Topics { get; set; } = new List<Topic>();
     public virtual ICollection<VocabularySet> VocabularySets { get; set; } = new List<VocabularySet>();

@@ -1,0 +1,1 @@
+   1:7>D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\API\Controllers\WritingController.cs(41,71): error CS1503: Argument 2: cannot convert from 'API.Controllers.StartSessionRequest' to 'Application.DTOs.Practice.StartSessionRequest' [D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\API\API.csproj]

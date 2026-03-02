@@ -16,4 +16,11 @@ public class PartTypeRepository : IPartTypeRepository
 
     public async Task<PartType?> GetByIdAsync(int id) =>
         await _context.PartTypes.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+
+    public async Task<PartType> CreateAsync(PartType entity)
+    {
+        _context.PartTypes.Add(entity);
+        await _context.SaveChangesAsync();
+        return entity;
+    }
 }

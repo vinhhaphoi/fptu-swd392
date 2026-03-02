@@ -1,0 +1,19 @@
+﻿  Determining projects to restore...
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c
+  All projects are up-to-date for restore.
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c
+  Domain -> D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Domain\bin\Debug\net8.0\Domain.dll
+  Application -> D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Application\bin\Debug\net8.0\Application.dll
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Data\Configurations\LanguageCheckConfiguration.cs(19,37): error CS1061: 'LanguageCheck' does not contain a definition for 'CheckedAt' and no accessible extension method 'CheckedAt' accepting a first argument of type 'LanguageCheck' could be found (are you missing a using directive or an assembly reference?) [D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj]
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Data\Configurations\HintConfiguration.cs(21,37): error CS1061: 'Topic' does not contain a definition for 'Hints' and no accessible extension method 'Hints' accepting a first argument of type 'Topic' could be found (are you missing a using directive or an assembly reference?) [D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj]
+
+Build FAILED.
+
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Data\Configurations\LanguageCheckConfiguration.cs(19,37): error CS1061: 'LanguageCheck' does not contain a definition for 'CheckedAt' and no accessible extension method 'CheckedAt' accepting a first argument of type 'LanguageCheck' could be found (are you missing a using directive or an assembly reference?) [D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj]
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Data\Configurations\HintConfiguration.cs(21,37): error CS1061: 'Topic' does not contain a definition for 'Hints' and no accessible extension method 'Hints' accepting a first argument of type 'Topic' could be found (are you missing a using directive or an assembly reference?) [D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj]
+    2 Warning(s)
+    2 Error(s)
+
+Time Elapsed 00:00:07.94

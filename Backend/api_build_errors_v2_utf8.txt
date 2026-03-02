@@ -1,0 +1,16 @@
+﻿  Determining projects to restore...
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\API\API.csproj]
+  All projects are up-to-date for restore.
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c
+  Domain -> D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Domain\bin\Debug\net8.0\Domain.dll
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Application\Services\PracticeSessionService.cs(96,34): error CS1061: 'IPracticeSessionRepository' does not contain a definition for 'UpdateAsync' and no accessible extension method 'UpdateAsync' accepting a first argument of type 'IPracticeSessionRepository' could be found (are you missing a using directive or an assembly reference?) [D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Application\Application.csproj]
+
+Build FAILED.
+
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c [D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\API\API.csproj]
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Infrastructure\Infrastructure.csproj : warning NU1903: Package 'Npgsql' 8.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-x9vc-6hfv-hg8c
+D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Application\Services\PracticeSessionService.cs(96,34): error CS1061: 'IPracticeSessionRepository' does not contain a definition for 'UpdateAsync' and no accessible extension method 'UpdateAsync' accepting a first argument of type 'IPracticeSessionRepository' could be found (are you missing a using directive or an assembly reference?) [D:\FPT STUDY\8_SPRING 2026\SWD392\Team-Github\fptu-swd392\Backend\src\Application\Application.csproj]
+    2 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:05.23

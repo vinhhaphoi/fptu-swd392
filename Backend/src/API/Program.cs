@@ -112,6 +112,7 @@ builder.Services.AddScoped<IPracticeSessionService, PracticeSessionService>();
 builder.Services.AddScoped<IWritingService, WritingService>();
 builder.Services.AddScoped<IWritingSupportService, WritingSupportService>();
 builder.Services.AddScoped<ILearningPathService, LearningPathService>();
+builder.Services.AddScoped<IVstepQuestionImportService, VstepQuestionImportService>();
 
 // Dependency Injection - Infrastructure
 builder.Services.AddInfrastructure(builder.Configuration);
