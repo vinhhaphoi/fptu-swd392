@@ -10,6 +10,6 @@ public class UpdateUserRequest
     public string Name { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; }
     public Role Role { get; set; }
-    public int? TargetLevelId { get; set; }
+    public Guid? TargetLevelId { get; set; }
     public bool IsActive { get; set; }
 }

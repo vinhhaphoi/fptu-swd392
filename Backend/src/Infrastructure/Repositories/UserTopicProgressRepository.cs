@@ -14,12 +14,12 @@ public class UserTopicProgressRepository : IUserTopicProgressRepository
         _context = context;
     }
 
-    public async Task<UserTopicProgress?> GetAsync(int userId, Guid topicId)
+    public async Task<UserTopicProgress?> GetAsync(Guid userId, Guid topicId)
     {
         return await _context.UserTopicProgresses.FirstOrDefaultAsync(p => p.UserId == userId && p.TopicId == topicId);
     }
 
-    public async Task<List<UserTopicProgress>> GetByUserIdAsync(int userId)
+    public async Task<List<UserTopicProgress>> GetByUserIdAsync(Guid userId)
     {
         return await _context.UserTopicProgresses.Where(p => p.UserId == userId).ToListAsync();
     }

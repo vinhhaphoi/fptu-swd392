@@ -2,10 +2,10 @@ namespace Domain.Entities;
 
 public class Hint
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public Guid TopicId { get; set; }
-    public int LevelId { get; set; }
-    public int HintTypeId { get; set; }
+    public Guid LevelId { get; set; }
+    public Guid HintTypeId { get; set; }
     public string Content { get; set; } = string.Empty;
     public int? DisplayOrder { get; set; }
 

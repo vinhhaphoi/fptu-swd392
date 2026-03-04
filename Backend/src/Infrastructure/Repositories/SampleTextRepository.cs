@@ -11,13 +11,13 @@ public class SampleTextRepository : ISampleTextRepository
 
     public SampleTextRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<List<SampleText>> GetByTopicAndLevelAsync(Guid topicId, int levelId) =>
+    public async Task<List<SampleText>> GetByTopicAndLevelAsync(Guid topicId, Guid levelId) =>
         await _context.SampleTexts
             .AsNoTracking()
             .Where(x => x.TopicId == topicId && x.LevelId == levelId)
             .ToListAsync();
 
-    public async Task<SampleText?> GetByIdAsync(int id) => await _context.SampleTexts.FindAsync(id);
+    public async Task<SampleText?> GetByIdAsync(Guid id) => await _context.SampleTexts.FindAsync(id);
 
     public async Task<SampleText> CreateAsync(SampleText entity)
     {
@@ -33,7 +33,7 @@ public class SampleTextRepository : ISampleTextRepository
         return entity;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
         var e = await _context.SampleTexts.FindAsync(id);
         if (e != null) { _context.SampleTexts.Remove(e); await _context.SaveChangesAsync(); }

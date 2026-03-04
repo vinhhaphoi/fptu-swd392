@@ -14,6 +14,6 @@ public class PracticeModeRepository : IPracticeModeRepository
     public async Task<List<PracticeMode>> GetAllAsync() =>
         await _context.PracticeModes.AsNoTracking().OrderBy(x => x.Code).ToListAsync();
 
-    public async Task<PracticeMode?> GetByIdAsync(int id) =>
+    public async Task<PracticeMode?> GetByIdAsync(Guid id) =>
         await _context.PracticeModes.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 }

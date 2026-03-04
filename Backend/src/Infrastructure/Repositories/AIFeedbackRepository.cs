@@ -14,7 +14,7 @@ public class AIFeedbackRepository : IAIFeedbackRepository
         _context = context;
     }
 
-    public async Task<List<AIFeedback>> GetBySubmissionIdAsync(int submissionId)
+    public async Task<List<AIFeedback>> GetBySubmissionIdAsync(Guid submissionId)
     {
         return await _context.AIFeedbacks
             .Where(f => f.SubmissionId == submissionId)

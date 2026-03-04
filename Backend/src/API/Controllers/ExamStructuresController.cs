@@ -16,8 +16,8 @@ public class ExamStructuresController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll() => Ok(await _repo.GetAllAsync());
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
         var item = await _repo.GetByIdAsync(id);
         return item == null ? NotFound() : Ok(item);
@@ -37,9 +37,9 @@ public class ExamStructuresController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:guid}")]
     [Authorize(Policy = "Authenticated")]
-    public async Task<IActionResult> Update(int id, [FromBody] CreateExamStructureRequest request)
+    public async Task<IActionResult> Update(Guid id, [FromBody] CreateExamStructureRequest request)
     {
         var existing = await _repo.GetByIdAsync(id);
         if (existing == null) return NotFound();
@@ -50,9 +50,9 @@ public class ExamStructuresController : ControllerBase
         return Ok(existing);
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id:guid}")]
     [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(Guid id)
     {
         var existing = await _repo.GetByIdAsync(id);
         if (existing == null) return NotFound();

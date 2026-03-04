@@ -4,10 +4,10 @@ using System;
 
 public class SystemPrompt
 {
-    public int Id { get; set; }      // Kept as int to match prompt_id in DB
-    public int PartId { get; set; }  // Matches part_id in DB
-    public int LevelId { get; set; } // Matches level_id in DB
-    public int PurposeId { get; set; } // Matches purpose_id in DB
+    public Guid Id { get; set; }
+    public Guid PartId { get; set; }
+    public Guid LevelId { get; set; }
+    public Guid PurposeId { get; set; }
     public string PromptContent { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

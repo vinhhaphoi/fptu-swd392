@@ -14,7 +14,7 @@ public class RubricRepository : IRubricRepository
         _context = context;
     }
 
-    public async Task<List<Rubric>> GetByPartIdAsync(int partId)
+    public async Task<List<Rubric>> GetByPartIdAsync(Guid partId)
     {
         return await _context.Rubrics.Where(r => r.PartId == partId).ToListAsync();
     }

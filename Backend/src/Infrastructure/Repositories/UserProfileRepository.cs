@@ -14,7 +14,7 @@ public class UserProfileRepository : IUserProfileRepository
         _context = context;
     }
 
-    public async Task<UserProfile?> GetByUserIdAsync(int userId)
+    public async Task<UserProfile?> GetByUserIdAsync(Guid userId)
     {
         return await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
     }

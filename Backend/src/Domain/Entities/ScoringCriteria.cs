@@ -4,7 +4,7 @@ using System;
 
 public class ScoringCriteria
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public Guid RubricId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }

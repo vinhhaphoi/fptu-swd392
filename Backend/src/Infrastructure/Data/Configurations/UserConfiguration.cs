@@ -11,17 +11,12 @@ namespace Infrastructure.Data.Configurations
             builder.ToTable("users");
             
             builder.HasKey(e => e.Id);
-
-            builder.Property(e => e.Id)
-                   .HasColumnName("user_id");
+            builder.Property(e => e.Id).HasColumnName("id");
 
             builder.Property(e => e.Name)
                    .HasColumnName("name")
                    .HasMaxLength(100)
                    .IsRequired();
-
-            // dob not in initial migration - add via migration if you need date of birth
-            builder.Ignore(e => e.Dob);
 
             builder.Property(e => e.Username)
                    .HasColumnName("username")
@@ -32,6 +27,9 @@ namespace Infrastructure.Data.Configurations
                    .HasColumnName("email")
                    .HasMaxLength(150)
                    .IsRequired();
+
+            builder.Property(e => e.Dob)
+                   .HasColumnName("dob");
 
             builder.Property(e => e.PhoneNumber)
                    .HasColumnName("phone_number")
@@ -57,8 +55,8 @@ namespace Infrastructure.Data.Configurations
             builder.Property(e => e.UpdatedAt)
                    .HasColumnName("updated_at");
 
-            // deleted_at not in initial migration - add via migration AddDeletedAtToUsers if you need soft delete
-            builder.Ignore(e => e.DeletedAt);
+            builder.Property(e => e.DeletedAt)
+                   .HasColumnName("deleted_at");
 
             builder.Property(e => e.IsActive)
                    .HasColumnName("is_active")

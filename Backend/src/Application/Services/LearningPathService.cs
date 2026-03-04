@@ -13,7 +13,7 @@ public class LearningPathService : ILearningPathService
         _planRepository = planRepository;
     }
 
-    public async Task<LearningPlan> GenerateInitialPlanAsync(int userId, int targetLevelId)
+    public async Task<LearningPlan> GenerateInitialPlanAsync(Guid userId, Guid targetLevelId)
     {
         var plan = new LearningPlan
         {
@@ -29,7 +29,7 @@ public class LearningPathService : ILearningPathService
         return await _planRepository.CreateAsync(plan);
     }
 
-    public async Task UpdatePlanAfterEvaluationAsync(int userId, float lastOverallScore)
+    public async Task UpdatePlanAfterEvaluationAsync(Guid userId, float lastOverallScore)
     {
         var plan = await _planRepository.GetByUserIdAsync(userId);
         if (plan == null) return;
@@ -52,7 +52,7 @@ public class LearningPathService : ILearningPathService
         await _planRepository.UpdateAsync(plan);
     }
 
-    public async Task<LearningPlan?> GetUserPlanAsync(int userId)
+    public async Task<LearningPlan?> GetUserPlanAsync(Guid userId)
     {
         return await _planRepository.GetByUserIdAsync(userId);
     }

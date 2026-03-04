@@ -19,7 +19,7 @@ public class ExamAttemptRepository : IExamAttemptRepository
         return await _context.ExamAttempts.FindAsync(id);
     }
 
-    public async Task<List<ExamAttempt>> GetByUserIdAsync(int userId)
+    public async Task<List<ExamAttempt>> GetByUserIdAsync(Guid userId)
     {
         return await _context.ExamAttempts.Where(a => a.UserId == userId).ToListAsync();
     }

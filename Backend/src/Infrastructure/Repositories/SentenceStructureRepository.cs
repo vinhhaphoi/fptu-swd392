@@ -14,7 +14,7 @@ public class SentenceStructureRepository : ISentenceStructureRepository
         _context = context;
     }
 
-    public async Task<List<SentenceStructure>> GetByTopicAndLevelAsync(Guid topicId, int levelId)
+    public async Task<List<SentenceStructure>> GetByTopicAndLevelAsync(Guid topicId, Guid levelId)
     {
         return await _context.SentenceStructures.Where(s => s.TopicId == topicId && s.LevelId == levelId).ToListAsync();
     }
@@ -33,7 +33,7 @@ public class SentenceStructureRepository : ISentenceStructureRepository
         return structure;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
         var structure = await _context.SentenceStructures.FindAsync(id);
         if (structure != null)

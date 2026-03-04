@@ -22,7 +22,7 @@ public class PracticeSessionService : IPracticeSessionService
         _examAttemptRepository = examAttemptRepository;
     }
 
-    public async Task<PracticeSessionResponse> StartSessionAsync(int userId, StartSessionRequest request)
+    public async Task<PracticeSessionResponse> StartSessionAsync(Guid userId, StartSessionRequest request)
     {
         var mode = await _modeRepository.GetByIdAsync(request.PracticeModeId);
         if (mode == null) throw new InvalidOperationException("Invalid practice mode");
@@ -47,6 +47,7 @@ public class PracticeSessionService : IPracticeSessionService
 
         var session = new PracticeSession
         {
+            Id = Guid.NewGuid(),
             UserId = userId,
             PracticeModeId = request.PracticeModeId,
             TopicId = request.TopicId,
@@ -63,13 +64,14 @@ public class PracticeSessionService : IPracticeSessionService
             UserId = session.UserId,
             ModeCode = mode.Code,
             TopicId = session.TopicId,
+            PracticeModeId = session.PracticeModeId,
             ExamAttemptId = session.ExamAttemptId,
             Status = session.Status.ToString(),
             StartedAt = session.StartedAt
         };
     }
 
-    public async Task<PracticeSessionResponse> GetSessionAsync(int sessionId)
+    public async Task<PracticeSessionResponse> GetSessionAsync(Guid sessionId)
     {
         var session = await _sessionRepository.GetByIdAsync(sessionId);
         if (session == null) throw new InvalidOperationException("Session not found");
@@ -80,13 +82,14 @@ public class PracticeSessionService : IPracticeSessionService
             UserId = session.UserId,
             ModeCode = session.PracticeMode?.Code ?? "UNKNOWN",
             TopicId = session.TopicId,
+            PracticeModeId = session.PracticeModeId,
             ExamAttemptId = session.ExamAttemptId,
             Status = session.Status.ToString(),
             StartedAt = session.StartedAt
         };
     }
 
-    public async Task<bool> EndSessionAsync(int sessionId)
+    public async Task<bool> EndSessionAsync(Guid sessionId)
     {
         var session = await _sessionRepository.GetByIdAsync(sessionId);
         if (session == null) return false;

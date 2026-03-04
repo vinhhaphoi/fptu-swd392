@@ -19,7 +19,7 @@ public class TopicVocabularySetRepository : ITopicVocabularySetRepository
         return await _context.TopicVocabularySets.Where(t => t.TopicId == topicId).ToListAsync();
     }
 
-    public async Task<List<TopicVocabularySet>> GetByVocabularySetIdAsync(int vocabularySetId)
+    public async Task<List<TopicVocabularySet>> GetByVocabularySetIdAsync(Guid vocabularySetId)
     {
         return await _context.TopicVocabularySets.Where(t => t.VocabularySetId == vocabularySetId).ToListAsync();
     }
@@ -30,7 +30,7 @@ public class TopicVocabularySetRepository : ITopicVocabularySetRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid topicId, int vocabularySetId)
+    public async Task DeleteAsync(Guid topicId, Guid vocabularySetId)
     {
         var mapping = await _context.TopicVocabularySets
             .FirstOrDefaultAsync(t => t.TopicId == topicId && t.VocabularySetId == vocabularySetId);

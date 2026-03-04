@@ -4,7 +4,7 @@ namespace Application.Interfaces.Services;
 
 public interface IPracticeSessionService
 {
-    Task<PracticeSessionResponse> StartSessionAsync(int userId, StartSessionRequest request);
-    Task<PracticeSessionResponse> GetSessionAsync(int sessionId);
-    Task<bool> EndSessionAsync(int sessionId);
+    Task<PracticeSessionResponse> StartSessionAsync(Guid userId, StartSessionRequest request);
+    Task<PracticeSessionResponse> GetSessionAsync(Guid sessionId);
+    Task<bool> EndSessionAsync(Guid sessionId);
 }

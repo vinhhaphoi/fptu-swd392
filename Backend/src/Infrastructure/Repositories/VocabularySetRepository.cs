@@ -11,14 +11,14 @@ public class VocabularySetRepository : IVocabularySetRepository
 
     public VocabularySetRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<List<VocabularySet>> GetByTopicAndLevelAsync(Guid topicId, int levelId) =>
+    public async Task<List<VocabularySet>> GetByTopicAndLevelAsync(Guid topicId, Guid levelId) =>
         await _context.VocabularySets
             .AsNoTracking()
             .Include(x => x.VocabularyItems)
             .Where(x => x.LevelId == levelId && x.TopicVocabularySets.Any(tvs => tvs.TopicId == topicId))
             .ToListAsync();
 
-    public async Task<VocabularySet?> GetByIdAsync(int id) => 
+    public async Task<VocabularySet?> GetByIdAsync(Guid id) => 
         await _context.VocabularySets
             .Include(x => x.VocabularyItems)
             .FirstOrDefaultAsync(x => x.Id == id);
@@ -37,7 +37,7 @@ public class VocabularySetRepository : IVocabularySetRepository
         return entity;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
         var e = await _context.VocabularySets.FindAsync(id);
         if (e != null) { _context.VocabularySets.Remove(e); await _context.SaveChangesAsync(); }

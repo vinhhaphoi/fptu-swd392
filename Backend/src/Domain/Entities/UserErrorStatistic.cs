@@ -5,10 +5,10 @@ namespace Domain.Entities;
 public class UserErrorStatistic
 {
     public Guid Id { get; set; }
-    public int UserId { get; set; }
-    public int CriteriaId { get; set; }
-    public int PartId { get; set; }
-    public int LevelId { get; set; }
+    public Guid UserId { get; set; }
+    public Guid CriteriaId { get; set; }
+    public Guid PartId { get; set; }
+    public Guid LevelId { get; set; }
     public int OccurrenceCount { get; set; }
     public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
 

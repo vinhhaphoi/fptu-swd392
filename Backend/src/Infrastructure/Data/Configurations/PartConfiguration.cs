@@ -63,7 +63,7 @@ namespace Infrastructure.Data.Configurations
             builder.HasMany(p => p.UserSubmissions)
                    .WithOne(us => us.Part)
                    .HasForeignKey(us => us.PartId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.SetNull);
 
             // Indexes
             builder.HasIndex(e => new { e.ExamStructureId, e.PartTypeId })

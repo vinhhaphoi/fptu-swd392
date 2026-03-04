@@ -4,9 +4,9 @@ using System;
 
 public class SentenceStructure
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public Guid TopicId { get; set; }
-    public int LevelId { get; set; }
+    public Guid LevelId { get; set; }
     public string StructurePattern { get; set; } = string.Empty;
     public string? Explanation { get; set; }
 

@@ -51,6 +51,11 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(object), 401)]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
+        if (request == null || string.IsNullOrWhiteSpace(request.Username))
+        {
+            return BadRequest(new { message = "Username and password are required." });
+        }
+
         try
         {
             var response = await _authService.LoginAsync(request);
@@ -63,20 +68,14 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error during login for username: {Username}", request.Username);
-
-            var message = "An error occurred during login. Please try again.";
+            _logger.LogError(ex, "Unexpected error during login for username: {Username}", request?.Username);
+            // In Development, return actual error so you can fix config/DB issues
             if (_env.IsDevelopment())
             {
-                return StatusCode(500, new
-                {
-                    message,
-                    detail = ex.InnerException?.Message ?? ex.Message,
-                    stackTrace = ex.StackTrace
-                });
+                var detail = ex.InnerException?.Message ?? ex.Message;
+                return StatusCode(500, new { message = "An error occurred during login.", detail, stackTrace = ex.StackTrace });
             }
-
-            return BadRequest(new { message });
+            return BadRequest(new { message = "An error occurred during login. Please try again." });
         }
     }
 
@@ -149,6 +148,11 @@ public class AuthController : ControllerBase
             
             return Ok(response);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Invalid registration data: {Message}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
         catch (DbUpdateException ex)
         {
             // Database constraint violations (rare, as validation happens first)
@@ -157,11 +161,6 @@ public class AuthController : ControllerBase
             
             // Extract meaningful error message
             var errorMessage = ExtractDbErrorMessage(ex);
-            // In Development, include the actual DB error for debugging
-            if (_env.IsDevelopment())
-            {
-                return BadRequest(new { message = errorMessage, detail = ex.InnerException?.Message });
-            }
             return BadRequest(new { message = errorMessage });
         }
         catch (Exception ex)
@@ -275,7 +274,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
     {
         var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized();
         try
         {
@@ -369,11 +368,6 @@ public class AuthController : ControllerBase
             {
                 return "Required level data is missing from the database. Please contact administrator to ensure reference data is seeded.";
             }
-            // Column or table (relation) does not exist - schema mismatch
-            if (innerException.Contains("column", StringComparison.OrdinalIgnoreCase))
-                return "Database schema mismatch: a required column is missing. Please run migrations or contact administrator.";
-            if (innerException.Contains("relation", StringComparison.OrdinalIgnoreCase))
-                return "Database schema mismatch: required table does not exist. Please run migrations (e.g. dotnet ef database update) or ensure the correct database is configured.";
             return "Referenced data does not exist.";
         }
 

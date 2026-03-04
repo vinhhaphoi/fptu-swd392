@@ -4,9 +4,9 @@ using System;
 
 public class CriteriaScore
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public Guid SubmissionScoreId { get; set; }
-    public int CriteriaId { get; set; }
+    public Guid CriteriaId { get; set; }
     public float? Score { get; set; }
     public string? Feedback { get; set; }
 

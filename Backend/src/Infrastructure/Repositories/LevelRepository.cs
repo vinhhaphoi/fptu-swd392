@@ -14,6 +14,6 @@ public class LevelRepository : ILevelRepository
     public async Task<List<Level>> GetAllAsync() =>
         await _context.Levels.AsNoTracking().OrderBy(x => x.LevelCode).ToListAsync();
 
-    public async Task<Level?> GetByIdAsync(int id) =>
+    public async Task<Level?> GetByIdAsync(Guid id) =>
         await _context.Levels.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 }

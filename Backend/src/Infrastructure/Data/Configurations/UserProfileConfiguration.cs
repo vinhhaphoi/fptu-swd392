@@ -11,9 +11,7 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.ToTable("user_profiles");
 
         builder.HasKey(up => up.UserId);
-
-        builder.Property(up => up.UserId)
-            .HasColumnName("user_id");
+        builder.Property(up => up.UserId).HasColumnName("user_id");
 
         builder.Property(up => up.FullName)
             .HasColumnName("full_name")
@@ -38,10 +36,5 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.Property(up => up.UpdatedAt)
             .HasColumnName("updated_at")
             .IsRequired();
-
-        builder.HasOne(up => up.User)
-            .WithOne(u => u.UserProfile)
-            .HasForeignKey<UserProfile>(up => up.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

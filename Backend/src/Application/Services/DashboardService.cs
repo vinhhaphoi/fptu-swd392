@@ -12,22 +12,28 @@ public class DashboardService : IDashboardService
     private readonly IPracticeSessionRepository _practiceSessionRepository;
     private readonly IUserSubmissionRepository _submissionRepository;
     private readonly ITopicRepository _topicRepository;
+    private readonly IExamStructureRepository _examStructureRepository;
+    private readonly IPartRepository _partRepository;
 
     public DashboardService(
         IUserRepository userRepository,
         IUserProfileRepository userProfileRepository,
         IPracticeSessionRepository practiceSessionRepository,
         IUserSubmissionRepository submissionRepository,
-        ITopicRepository topicRepository)
+        ITopicRepository topicRepository,
+        IExamStructureRepository examStructureRepository,
+        IPartRepository partRepository)
     {
         _userRepository = userRepository;
         _userProfileRepository = userProfileRepository;
         _practiceSessionRepository = practiceSessionRepository;
         _submissionRepository = submissionRepository;
         _topicRepository = topicRepository;
+        _examStructureRepository = examStructureRepository;
+        _partRepository = partRepository;
     }
 
-    public async Task<DashboardStatsResponse> GetUserStatsAsync(int userId)
+    public async Task<DashboardStatsResponse> GetUserStatsAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) throw new InvalidOperationException("User not found");
@@ -68,7 +74,12 @@ public class DashboardService : IDashboardService
         
         // 1. Topics not yet practiced in target level
         var submittedTopicIds = practiceSessions.Select(ps => ps.TopicId).Where(id => id.HasValue).Select(id => id!.Value).Distinct().ToList();
-        var targetLevelTopics = await _topicRepository.GetByPartIdAsync(1); // Should be filtered by target level
+        var firstPartId = (await _examStructureRepository.GetAllAsync()).FirstOrDefault() is { } es
+            ? (await _partRepository.GetByExamStructureIdAsync(es.Id)).FirstOrDefault()?.Id
+            : null;
+        var targetLevelTopics = firstPartId.HasValue
+            ? await _topicRepository.GetByPartIdAsync(firstPartId.Value)
+            : new List<Topic>();
         suggestions.Topics = targetLevelTopics
             .Where(t => !submittedTopicIds.Contains(t.Id))
             .Take(2)

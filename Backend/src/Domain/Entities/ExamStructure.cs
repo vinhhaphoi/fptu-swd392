@@ -5,7 +5,7 @@ namespace Domain.Entities;
 
 public class ExamStructure
 {
-    public int Id { get; set; }      // Kept as int to match exam_structure_id in DB
+    public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public int TotalParts { get; set; }
     public string? Description { get; set; }

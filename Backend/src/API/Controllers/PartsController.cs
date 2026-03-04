@@ -13,12 +13,12 @@ public class PartsController : ControllerBase
 
     public PartsController(IPartRepository repo) => _repo = repo;
 
-    [HttpGet("by-exam/{examStructureId:int}")]
-    public async Task<IActionResult> GetByExamStructure(int examStructureId) =>
+    [HttpGet("by-exam/{examStructureId:guid}")]
+    public async Task<IActionResult> GetByExamStructure(Guid examStructureId) =>
         Ok(await _repo.GetByExamStructureIdAsync(examStructureId));
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
         var item = await _repo.GetByIdAsync(id);
         return item == null ? NotFound() : Ok(item);
@@ -41,9 +41,9 @@ public class PartsController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:guid}")]
     [Authorize(Policy = "Authenticated")]
-    public async Task<IActionResult> Update(int id, [FromBody] CreatePartRequest request)
+    public async Task<IActionResult> Update(Guid id, [FromBody] CreatePartRequest request)
     {
         var existing = await _repo.GetByIdAsync(id);
         if (existing == null) return NotFound();
@@ -57,9 +57,9 @@ public class PartsController : ControllerBase
         return Ok(existing);
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id:guid}")]
     [Authorize(Policy = "AdminOnly")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> Delete(Guid id)
     {
         var existing = await _repo.GetByIdAsync(id);
         if (existing == null) return NotFound();
@@ -70,8 +70,8 @@ public class PartsController : ControllerBase
 
 public class CreatePartRequest
 {
-    public int ExamStructureId { get; set; }
-    public int PartTypeId { get; set; }
+    public Guid ExamStructureId { get; set; }
+    public Guid PartTypeId { get; set; }
     public string? Description { get; set; }
     public int? TimeLimit { get; set; }
     public int? MinWords { get; set; }

@@ -11,15 +11,7 @@ public class TopicRepository : ITopicRepository
 
     public TopicRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<List<Topic>> GetActiveTopicsAsync(int? partId = null, int? levelId = null)
-    {
-        var q = _context.Topics.AsNoTracking().Where(x => x.IsActive);
-        if (partId.HasValue) q = q.Where(x => x.PartId == partId.Value);
-        if (levelId.HasValue) q = q.Where(x => x.LevelId == levelId.Value);
-        return await q.OrderBy(x => x.PartId).ThenBy(x => x.LevelId).ThenBy(x => x.Title).ToListAsync();
-    }
-
-    public async Task<List<Topic>> GetByPartIdAsync(int partId) =>
+    public async Task<List<Topic>> GetByPartIdAsync(Guid partId) =>
         await _context.Topics.AsNoTracking().Where(x => x.PartId == partId).ToListAsync();
 
     public async Task<Topic?> GetByIdAsync(Guid id) => await _context.Topics.FindAsync(id);

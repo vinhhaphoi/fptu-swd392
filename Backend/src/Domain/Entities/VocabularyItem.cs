@@ -4,8 +4,8 @@ using System;
 
 public class VocabularyItem
 {
-    public int Id { get; set; }
-    public int VocabularySetId { get; set; }
+    public Guid Id { get; set; }
+    public Guid VocabularySetId { get; set; }
     public string Word { get; set; } = string.Empty;
     public string Meaning { get; set; } = string.Empty;
     public string? Example { get; set; }

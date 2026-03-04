@@ -14,8 +14,8 @@ public class LevelsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll() => Ok(await _repo.GetAllAsync());
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
     {
         var level = await _repo.GetByIdAsync(id);
         return level == null ? NotFound() : Ok(level);

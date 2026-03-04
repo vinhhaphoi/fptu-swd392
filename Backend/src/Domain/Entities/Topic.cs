@@ -5,8 +5,8 @@ using System;
 public class Topic
 {
     public Guid Id { get; set; }
-    public int PartId { get; set; }
-    public int LevelId { get; set; }
+    public Guid PartId { get; set; }
+    public Guid LevelId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Prompt { get; set; } = string.Empty;
     public string? Purpose { get; set; }

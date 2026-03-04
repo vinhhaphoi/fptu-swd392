@@ -11,7 +11,7 @@ public class LanguageError
 
 public class LanguageCheckResponse
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string CheckType { get; set; } = string.Empty;
     public List<LanguageError> GrammarErrors { get; set; } = new();
     public List<LanguageError> SpellingErrors { get; set; } = new();

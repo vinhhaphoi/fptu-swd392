@@ -11,10 +11,10 @@ public class PartRepository : IPartRepository
 
     public PartRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<List<Part>> GetByExamStructureIdAsync(int examStructureId) =>
+    public async Task<List<Part>> GetByExamStructureIdAsync(Guid examStructureId) =>
         await _context.Parts.AsNoTracking().Where(x => x.ExamStructureId == examStructureId).ToListAsync();
 
-    public async Task<Part?> GetByIdAsync(int id) => await _context.Parts.FindAsync(id);
+    public async Task<Part?> GetByIdAsync(Guid id) => await _context.Parts.FindAsync(id);
 
     public async Task<Part> CreateAsync(Part entity)
     {
@@ -30,7 +30,7 @@ public class PartRepository : IPartRepository
         return entity;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
         var e = await _context.Parts.FindAsync(id);
         if (e != null) { _context.Parts.Remove(e); await _context.SaveChangesAsync(); }

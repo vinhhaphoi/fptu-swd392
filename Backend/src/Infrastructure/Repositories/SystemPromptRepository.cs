@@ -11,7 +11,7 @@ public class SystemPromptRepository : ISystemPromptRepository
 
     public SystemPromptRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<SystemPrompt?> GetActivePromptAsync(int partId, int levelId, string purposeCode) =>
+    public async Task<SystemPrompt?> GetActivePromptAsync(Guid partId, Guid levelId, string purposeCode) =>
         await _context.SystemPrompts
             .AsNoTracking()
             .Include(x => x.Purpose)
@@ -20,7 +20,7 @@ public class SystemPromptRepository : ISystemPromptRepository
 
     public async Task<List<SystemPrompt>> GetAllAsync() => await _context.SystemPrompts.ToListAsync();
 
-    public async Task<SystemPrompt?> GetByIdAsync(int id) => await _context.SystemPrompts.FindAsync(id);
+    public async Task<SystemPrompt?> GetByIdAsync(Guid id) => await _context.SystemPrompts.FindAsync(id);
 
     public async Task<SystemPrompt> CreateAsync(SystemPrompt entity)
     {

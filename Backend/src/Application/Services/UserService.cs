@@ -37,13 +37,13 @@ public class UserService : IUserService
         return user == null ? null : MapToProfile(user);
     }
 
-    public async Task<UserProfileResponse?> GetProfileByIdAsync(int userId)
+    public async Task<UserProfileResponse?> GetProfileByIdAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         return user == null ? null : MapToProfile(user);
     }
 
-    public async Task<UserProfileResponse?> UpdateProfileAsync(int userId, UpdateProfileRequest request)
+    public async Task<UserProfileResponse?> UpdateProfileAsync(Guid userId, UpdateProfileRequest request)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return null;
@@ -51,10 +51,18 @@ public class UserService : IUserService
         if (request.Email != user.Email && await _userRepository.ExistsByEmailAsync(request.Email))
             throw new InvalidOperationException("Email already in use");
 
+        var targetLevelId = request.TargetLevelId is { } tid && tid != Guid.Empty ? tid : (Guid?)null;
+        if (targetLevelId.HasValue)
+        {
+            var level = await _levelRepository.GetByIdAsync(targetLevelId.Value);
+            if (level == null)
+                throw new ArgumentException("The selected level does not exist. Call GET /api/levels for valid level IDs.");
+        }
+
         user.Name = request.Name;
         user.Email = request.Email;
         user.Dob = request.Dob;
-        user.TargetLevelId = request.TargetLevelId;
+        user.TargetLevelId = targetLevelId;
 
         // Trigger learning plan generation if target level is updated or if no plan exists
         var existingPlan = await _learningPathService.GetUserPlanAsync(userId);
@@ -66,6 +74,32 @@ public class UserService : IUserService
         user.UpdatedAt = DateTime.UtcNow;
         var updated = await _userRepository.UpdateAsync(user);
         return MapToProfile(updated);
+    }
+
+    public async Task<UserProfileResponse?> SetTargetLevelAsync(Guid userId, Guid? targetLevelId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null) return null;
+
+        // Treat Guid.Empty as null (clear target level)
+        var levelId = targetLevelId is { } id && id != Guid.Empty ? id : (Guid?)null;
+
+        if (levelId.HasValue)
+        {
+            var level = await _levelRepository.GetByIdAsync(levelId.Value);
+            if (level == null)
+                throw new ArgumentException("The selected level does not exist. Call GET /api/levels for valid level IDs.");
+        }
+
+        user.TargetLevelId = levelId;
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userRepository.UpdateAsync(user);
+
+        var existingPlan = await _learningPathService.GetUserPlanAsync(userId);
+        if (existingPlan == null && levelId.HasValue)
+            await _learningPathService.GenerateInitialPlanAsync(userId, levelId.Value);
+
+        return MapToProfile(user);
     }
 
     private static UserProfileResponse MapToProfile(User user)
@@ -141,7 +175,7 @@ public class UserService : IUserService
         return responses;
     }
 
-    public async Task<AdminUserResponse?> GetUserByIdForAdminAsync(int userId)
+    public async Task<AdminUserResponse?> GetUserByIdForAdminAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return null;
@@ -181,6 +215,7 @@ public class UserService : IUserService
         
         var user = new User
         {
+            Id = Guid.NewGuid(),
             Name = request.Name,
             Username = request.Username,
             Email = request.Email,
@@ -216,7 +251,7 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<AdminUserResponse?> UpdateUserAsync(int userId, UpdateUserRequest request)
+    public async Task<AdminUserResponse?> UpdateUserAsync(Guid userId, UpdateUserRequest request)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return null;
@@ -254,7 +289,7 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<bool> UpdateUserPasswordAsync(int userId, UpdateUserPasswordRequest request)
+    public async Task<bool> UpdateUserPasswordAsync(Guid userId, UpdateUserPasswordRequest request)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return false;
@@ -266,7 +301,7 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<bool> DeleteUserAsync(int userId)
+    public async Task<bool> DeleteUserAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return false;
@@ -279,7 +314,7 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<bool> ToggleUserStatusAsync(int userId)
+    public async Task<bool> ToggleUserStatusAsync(Guid userId)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return false;

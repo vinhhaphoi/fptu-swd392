@@ -2,8 +2,8 @@ namespace Application.DTOs.Writing;
 
 public class UserSubmissionResponse
 {
-    public int Id { get; set; }
-    public int PracticeSessionId { get; set; }
+    public Guid Id { get; set; }
+    public Guid PracticeSessionId { get; set; }
     public int VersionNumber { get; set; }
     public bool IsFinal { get; set; }
     public string SubmissionText { get; set; } = string.Empty;

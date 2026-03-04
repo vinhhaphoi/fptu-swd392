@@ -14,7 +14,7 @@ public class ExamStructureRepository : IExamStructureRepository
     public async Task<List<ExamStructure>> GetAllAsync() =>
         await _context.ExamStructures.AsNoTracking().OrderBy(x => x.Name).ToListAsync();
 
-    public async Task<ExamStructure?> GetByIdAsync(int id) =>
+    public async Task<ExamStructure?> GetByIdAsync(Guid id) =>
         await _context.ExamStructures.FindAsync(id);
 
     public async Task<ExamStructure> CreateAsync(ExamStructure entity)
@@ -31,7 +31,7 @@ public class ExamStructureRepository : IExamStructureRepository
         return entity;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
         var e = await _context.ExamStructures.FindAsync(id);
         if (e != null) { _context.ExamStructures.Remove(e); await _context.SaveChangesAsync(); }

@@ -4,8 +4,8 @@ namespace Application.Interfaces.Repositories;
 
 public interface ISentenceStructureRepository
 {
-    Task<List<SentenceStructure>> GetByTopicAndLevelAsync(Guid topicId, int levelId);
+    Task<List<SentenceStructure>> GetByTopicAndLevelAsync(Guid topicId, Guid levelId);
     Task<SentenceStructure> CreateAsync(SentenceStructure structure);
     Task<SentenceStructure> UpdateAsync(SentenceStructure structure);
-    Task DeleteAsync(int id);
+    Task DeleteAsync(Guid id);
 }

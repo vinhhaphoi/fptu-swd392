@@ -14,12 +14,12 @@ public class UserErrorStatisticRepository : IUserErrorStatisticRepository
         _context = context;
     }
 
-    public async Task<List<UserErrorStatistic>> GetByUserIdAsync(int userId)
+    public async Task<List<UserErrorStatistic>> GetByUserIdAsync(Guid userId)
     {
         return await _context.UserErrorStatistics.AsNoTracking().Where(s => s.UserId == userId).ToListAsync();
     }
 
-    public async Task<UserErrorStatistic?> GetAsync(int userId, int criteriaId, int partId, int levelId)
+    public async Task<UserErrorStatistic?> GetAsync(Guid userId, Guid criteriaId, Guid partId, Guid levelId)
     {
         return await _context.UserErrorStatistics
             .FirstOrDefaultAsync(x => x.UserId == userId && x.CriteriaId == criteriaId && x.PartId == partId && x.LevelId == levelId);
@@ -39,7 +39,7 @@ public class UserErrorStatisticRepository : IUserErrorStatisticRepository
         return statistic;
     }
 
-    public async Task<UserErrorStatistic> IncrementErrorCountAsync(int userId, int criteriaId, int partId, int levelId)
+    public async Task<UserErrorStatistic> IncrementErrorCountAsync(Guid userId, Guid criteriaId, Guid partId, Guid levelId)
     {
         var existing = await _context.UserErrorStatistics
             .FirstOrDefaultAsync(s => s.UserId == userId && s.CriteriaId == criteriaId && s.PartId == partId && s.LevelId == levelId);

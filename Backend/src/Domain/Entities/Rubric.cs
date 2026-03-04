@@ -6,7 +6,7 @@ namespace Domain.Entities;
 public class Rubric
 {
     public Guid Id { get; set; }
-    public int PartId { get; set; }
+    public Guid PartId { get; set; }
     public string Name { get; set; } = string.Empty;
     public int Version { get; set; }
     public bool IsActive { get; set; } = true;

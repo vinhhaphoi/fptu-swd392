@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -786,7 +786,7 @@ namespace Infrastructure.Migrations
                 table: "users",
                 column: "phone_number",
                 unique: true,
-                filter: "phone_number IS NOT NULL");
+                filter: "[phone_number] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_users_target_level_id",

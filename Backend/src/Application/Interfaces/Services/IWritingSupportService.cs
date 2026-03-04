@@ -4,6 +4,6 @@ namespace Application.Interfaces.Services;
 
 public interface IWritingSupportService
 {
-    Task<LanguageCheckResponse> CheckLanguageAsync(int submissionId, string text);
-    Task<List<string>> GetStructureSuggestionsAsync(Guid topicId, int levelId, string currentText);
+    Task<LanguageCheckResponse> CheckLanguageAsync(Guid submissionId, string text);
+    Task<List<string>> GetStructureSuggestionsAsync(Guid topicId, Guid levelId, string currentText);
 }

@@ -4,8 +4,8 @@ using System;
 
 public class VocabularySet
 {
-    public int Id { get; set; }
-    public int LevelId { get; set; }
+    public Guid Id { get; set; }
+    public Guid LevelId { get; set; }
     public string Name { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
 

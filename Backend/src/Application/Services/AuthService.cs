@@ -11,6 +11,7 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserProfileRepository _userProfileRepository;
+    private readonly ILevelRepository _levelRepository;
     private readonly IPasswordResetTokenRepository _passwordResetTokenRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtService _jwtService;
@@ -19,12 +20,14 @@ public class AuthService : IAuthService
     public AuthService(
         IUserRepository userRepository,
         IUserProfileRepository userProfileRepository,
+        ILevelRepository levelRepository,
         IPasswordResetTokenRepository passwordResetTokenRepository,
         IPasswordHasher passwordHasher,
         IJwtService jwtService)
     {
         _userRepository = userRepository;
         _userProfileRepository = userProfileRepository;
+        _levelRepository = levelRepository;
         _passwordResetTokenRepository = passwordResetTokenRepository;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
@@ -65,16 +68,26 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
+        // Treat Guid.Empty / default as null (client may omit targetLevelId or send "00000000-0000-0000-...")
+        var targetLevelId = request.TargetLevelId is { } id && id != Guid.Empty ? id : (Guid?)null;
+
+        if (targetLevelId.HasValue)
+        {
+            var level = await _levelRepository.GetByIdAsync(targetLevelId.Value);
+            if (level == null)
+                throw new ArgumentException("The selected level does not exist. Please choose a valid level (call GET /api/levels to list available levels).");
+        }
+
         var user = new User
         {
+            Id = Guid.NewGuid(),
             Name = request.Name,
             Username = request.Username,
             Email = request.Email,
             PhoneNumber = request.PhoneNumber,
             PasswordHash = _passwordHasher.Hash(request.Password),
             Role = Role.User,
-            // Temporarily ignore target level during registration to avoid FK issues when levels table is empty
-            TargetLevelId = null,
+            TargetLevelId = targetLevelId,
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         };
@@ -150,7 +163,7 @@ public class AuthService : IAuthService
         await _passwordResetTokenRepository.UpdateAsync(resetToken);
     }
 
-    public async Task ChangePasswordAsync(int userId, ChangePasswordRequest request)
+    public async Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request)
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null)

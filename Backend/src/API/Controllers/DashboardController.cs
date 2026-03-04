@@ -23,7 +23,7 @@ public class DashboardController : ControllerBase
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim == null) return Unauthorized();
 
-        if (!int.TryParse(userIdClaim.Value, out var userId))
+        if (!Guid.TryParse(userIdClaim.Value, out Guid userId))
             return BadRequest("Invalid user ID in token");
 
         var stats = await _dashboardService.GetUserStatsAsync(userId);

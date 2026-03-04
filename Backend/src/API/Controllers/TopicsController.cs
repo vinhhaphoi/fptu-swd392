@@ -40,8 +40,8 @@ public class TopicsController : ControllerBase
     /// </remarks>
     /// <param name="partId">Part ID to filter topics</param>
     /// <returns>List of topics for the specified part</returns>
-    [HttpGet("by-part/{partId:int}")]
-    public async Task<IActionResult> GetByPart(int partId) =>
+    [HttpGet("by-part/{partId:guid}")]
+    public async Task<IActionResult> GetByPart(Guid partId) =>
         Ok(await _repo.GetByPartIdAsync(partId));
 
     [HttpGet("{id:guid}")]
@@ -51,15 +51,15 @@ public class TopicsController : ControllerBase
         return item == null ? NotFound() : Ok(item);
     }
 
-    [HttpGet("{id:guid}/learning-resources/{levelId:int}")]
-    public async Task<IActionResult> GetLearningResources(Guid id, int levelId)
+    [HttpGet("{id:guid}/learning-resources/{levelId:guid}")]
+    public async Task<IActionResult> GetLearningResources(Guid id, Guid levelId)
     {
         var resources = await _learningService.GetTopicResourcesAsync(id, levelId);
         return Ok(resources);
     }
 
-    [HttpGet("{id:guid}/hints/{levelId:int}")]
-    public async Task<IActionResult> GetHints(Guid id, int levelId)
+    [HttpGet("{id:guid}/hints/{levelId:guid}")]
+    public async Task<IActionResult> GetHints(Guid id, Guid levelId)
     {
         var hints = await _hintService.GetHintsAsync(id, levelId);
         return Ok(hints);
@@ -111,10 +111,10 @@ public class TopicsController : ControllerBase
 
 public class CreateTopicRequest
 {
-    public int PartId { get; set; }
+    public Guid PartId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string? Prompt { get; set; }
     public string? Purpose { get; set; }
     public string? RecipientRole { get; set; }
-    public int LevelId { get; set; }
+    public Guid LevelId { get; set; }
 }

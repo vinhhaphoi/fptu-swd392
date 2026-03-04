@@ -4,9 +4,9 @@ using System;
 
 public class Part
 {
-    public int Id { get; set; }              // Kept as int to match part_id in DB
-    public int ExamStructureId { get; set; } // Matches exam_structure_id in DB
-    public int PartTypeId { get; set; }      // Matches part_type_id in DB
+    public Guid Id { get; set; }
+    public Guid ExamStructureId { get; set; }
+    public Guid PartTypeId { get; set; }
     public int PartNumber { get; set; }      // Added to match part_number in DB
     public string? Title { get; set; }       // Added to match title in DB
     public string? Description { get; set; }

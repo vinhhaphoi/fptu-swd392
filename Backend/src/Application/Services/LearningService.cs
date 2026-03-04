@@ -20,7 +20,7 @@ public class LearningService : ILearningService
         _sampleTextRepository = sampleTextRepository;
     }
 
-    public async Task<TopicLearningResourcesResponse> GetTopicResourcesAsync(Guid topicId, int levelId)
+    public async Task<TopicLearningResourcesResponse> GetTopicResourcesAsync(Guid topicId, Guid levelId)
     {
         var vocabSets = await _vocabSetRepository.GetByTopicAndLevelAsync(topicId, levelId);
         var sentenceStructures = await _sentenceStructureRepository.GetByTopicAndLevelAsync(topicId, levelId);

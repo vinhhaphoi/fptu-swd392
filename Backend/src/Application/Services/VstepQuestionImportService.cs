@@ -121,7 +121,7 @@ public class VstepQuestionImportService : IVstepQuestionImportService
         return string.Join("\n\n", t1).Trim();
     }
 
-    private async Task<(int part1Id, int part2Id)> EnsureExamStructureAndPartsAsync()
+    private async Task<(Guid part1Id, Guid part2Id)> EnsureExamStructureAndPartsAsync()
     {
         var structures = await _examStructureRepository.GetAllAsync();
         var vstep = structures.FirstOrDefault(s => s.Name.Contains("VSTEP", StringComparison.OrdinalIgnoreCase));
@@ -129,6 +129,7 @@ public class VstepQuestionImportService : IVstepQuestionImportService
         {
             vstep = new ExamStructure
             {
+                Id = Guid.NewGuid(),
                 Name = "VSTEP Writing",
                 Description = "VSTEP Writing Exam",
                 TotalParts = 2,
@@ -143,13 +144,13 @@ public class VstepQuestionImportService : IVstepQuestionImportService
         PartType type1, type2;
         if (partTypes.Count < 1)
         {
-            type1 = await _partTypeRepository.CreateAsync(new PartType { Code = "Task1", Description = "Part 1 - Letter/Email" });
-            type2 = await _partTypeRepository.CreateAsync(new PartType { Code = "Task2", Description = "Part 2 - Essay" });
+            type1 = await _partTypeRepository.CreateAsync(new PartType { Id = Guid.NewGuid(), Code = "Task1", Description = "Part 1 - Letter/Email" });
+            type2 = await _partTypeRepository.CreateAsync(new PartType { Id = Guid.NewGuid(), Code = "Task2", Description = "Part 2 - Essay" });
         }
         else if (partTypes.Count < 2)
         {
             type1 = partTypes[0];
-            type2 = await _partTypeRepository.CreateAsync(new PartType { Code = "Task2", Description = "Part 2 - Essay" });
+            type2 = await _partTypeRepository.CreateAsync(new PartType { Id = Guid.NewGuid(), Code = "Task2", Description = "Part 2 - Essay" });
         }
         else
         {
@@ -162,6 +163,7 @@ public class VstepQuestionImportService : IVstepQuestionImportService
         {
             part1 = new Part
             {
+                Id = Guid.NewGuid(),
                 ExamStructureId = vstep.Id,
                 PartTypeId = type1.Id,
                 PartNumber = 1,
@@ -179,6 +181,7 @@ public class VstepQuestionImportService : IVstepQuestionImportService
         {
             part2 = new Part
             {
+                Id = Guid.NewGuid(),
                 ExamStructureId = vstep.Id,
                 PartTypeId = type2.Id,
                 PartNumber = 2,
@@ -194,7 +197,7 @@ public class VstepQuestionImportService : IVstepQuestionImportService
         return (part1.Id, part2.Id);
     }
 
-    private async Task<int> EnsureDefaultLevelAsync()
+    private async Task<Guid> EnsureDefaultLevelAsync()
     {
         var levels = await _levelRepository.GetAllAsync();
         var level = levels.FirstOrDefault(l => l.LevelCode.Equals("B2", StringComparison.OrdinalIgnoreCase))

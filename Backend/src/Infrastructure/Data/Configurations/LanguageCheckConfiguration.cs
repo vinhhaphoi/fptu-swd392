@@ -10,8 +10,8 @@ namespace Infrastructure.Data.Configurations
         {
             builder.ToTable("language_checks");
             builder.HasKey(e => e.Id);
-            builder.Property(e => e.Id).HasColumnName("check_id").ValueGeneratedOnAdd();
-            builder.Property(e => e.UserSubmissionId).HasColumnName("submission_id").IsRequired();
+            builder.Property(e => e.Id).HasColumnName("check_id");
+            builder.Property(e => e.UserSubmissionId).HasColumnName("user_submission_id").IsRequired();
             builder.Property(e => e.CheckType).HasColumnName("check_type").HasMaxLength(50);
             builder.Property(e => e.GrammarErrors).HasColumnName("grammar_errors");
             builder.Property(e => e.SpellingErrors).HasColumnName("spelling_errors");

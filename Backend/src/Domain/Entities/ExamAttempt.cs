@@ -6,8 +6,8 @@ namespace Domain.Entities;
 public class ExamAttempt
 {
     public Guid Id { get; set; }
-    public int UserId { get; set; }
-    public int ExamStructureId { get; set; }
+    public Guid UserId { get; set; }
+    public Guid ExamStructureId { get; set; }
     public DateTime StartedAt { get; set; } = DateTime.UtcNow;
     public DateTime? SubmittedAt { get; set; }
     public float OverallScore { get; set; }

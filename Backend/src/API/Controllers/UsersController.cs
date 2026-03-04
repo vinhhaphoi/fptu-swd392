@@ -106,7 +106,7 @@ public class UsersController : ControllerBase
         try
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
                 return Unauthorized();
             
             // Validate request
@@ -122,6 +122,10 @@ public class UsersController : ControllerBase
             
             return Ok(profile);
         }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
         catch (InvalidOperationException ex)
         {
             return Conflict(new { message = ex.Message });
@@ -130,6 +134,41 @@ public class UsersController : ControllerBase
         {
             _logger.LogError(ex, "Error updating user profile for user ID: {UserId}", User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
             return StatusCode(500, new { message = "An error occurred while updating profile" });
+        }
+    }
+
+    /// <summary>
+    /// 🎯 Set or update target level (sau khi đăng ký không có target level)
+    /// </summary>
+    /// <remarks>
+    /// Ghi nhận target level cho user đã đăng nhập.
+    /// Gọi GET /api/levels để lấy danh sách level và chọn id hợp lệ.
+    /// Gửi targetLevelId = null để xóa target level.
+    /// 
+    /// Example: PUT /api/user/target-level
+    /// { "targetLevelId": "10000000-0000-0000-0000-000000000003" }
+    /// </remarks>
+    [HttpPut("target-level")]
+    [ProducesResponseType(typeof(UserProfileResponse), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> SetTargetLevel([FromBody] SetTargetLevelRequest request)
+    {
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        try
+        {
+            var profile = await _userService.SetTargetLevelAsync(userId, request?.TargetLevelId);
+            if (profile == null)
+                return NotFound(new { message = "User not found" });
+            return Ok(profile);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
         }
     }
 
@@ -179,7 +218,7 @@ public class UsersController : ControllerBase
         try
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
                 return Unauthorized();
 
             // Validate request
@@ -215,7 +254,7 @@ public class UsersController : ControllerBase
         try
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
                 return Unauthorized();
 
             // TODO: Implement user statistics service
@@ -251,7 +290,7 @@ public class UsersController : ControllerBase
         try
         {
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
                 return Unauthorized();
 
             // Validate limit parameter

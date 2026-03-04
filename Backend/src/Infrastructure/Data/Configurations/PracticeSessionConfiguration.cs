@@ -11,7 +11,6 @@ namespace Infrastructure.Data.Configurations
             builder.ToTable("practice_sessions");
             
             builder.HasKey(e => e.Id);
-            builder.Property(e => e.Id).HasColumnName("session_id");
 
             builder.Property(e => e.UserId)
                    .HasColumnName("user_id")

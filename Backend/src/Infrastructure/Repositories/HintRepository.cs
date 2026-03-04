@@ -11,14 +11,14 @@ public class HintRepository : IHintRepository
 
     public HintRepository(ApplicationDbContext context) => _context = context;
 
-    public async Task<List<Hint>> GetByTopicAndLevelAsync(Guid topicId, int levelId) =>
+    public async Task<List<Hint>> GetByTopicAndLevelAsync(Guid topicId, Guid levelId) =>
         await _context.Hints
             .AsNoTracking()
             .Include(x => x.HintType)
             .Where(x => x.TopicId == topicId && x.LevelId == levelId)
             .ToListAsync();
 
-    public async Task<Hint?> GetByIdAsync(int id) => await _context.Hints.FindAsync(id);
+    public async Task<Hint?> GetByIdAsync(Guid id) => await _context.Hints.FindAsync(id);
 
     public async Task<Hint> CreateAsync(Hint entity)
     {
@@ -34,7 +34,7 @@ public class HintRepository : IHintRepository
         return entity;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(Guid id)
     {
         var e = await _context.Hints.FindAsync(id);
         if (e != null) { _context.Hints.Remove(e); await _context.SaveChangesAsync(); }

@@ -14,5 +14,5 @@ public class ScoringCriteriaRepository : IScoringCriteriaRepository
     public async Task<List<ScoringCriteria>> GetByRubricIdAsync(Guid rubricId) =>
         await _context.ScoringCriteria.AsNoTracking().Where(x => x.RubricId == rubricId).ToListAsync();
 
-    public async Task<ScoringCriteria?> GetByIdAsync(int id) => await _context.ScoringCriteria.FindAsync(id);
+    public async Task<ScoringCriteria?> GetByIdAsync(Guid id) => await _context.ScoringCriteria.FindAsync(id);
 }

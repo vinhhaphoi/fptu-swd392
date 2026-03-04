@@ -8,6 +8,7 @@ public class LearningPlanConfiguration : IEntityTypeConfiguration<LearningPlan>
 {
     public void Configure(EntityTypeBuilder<LearningPlan> builder)
     {
+        builder.ToTable("learning_plans");
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.WeakArea)
