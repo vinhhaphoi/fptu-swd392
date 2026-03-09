@@ -113,7 +113,7 @@ public class CreateTopicRequest
 {
     public Guid PartId { get; set; }
     public string Title { get; set; } = string.Empty;
-    public string? Prompt { get; set; }
+    public string Prompt { get; set; } = string.Empty;
     public string? Purpose { get; set; }
     public string? RecipientRole { get; set; }
     public Guid LevelId { get; set; }

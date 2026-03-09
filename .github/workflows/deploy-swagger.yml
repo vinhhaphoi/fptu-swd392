@@ -39,6 +39,10 @@ jobs:
         working-directory: Backend
         env:
           ASPNETCORE_ENVIRONMENT: Development
+          Jwt__SecretKey: ${{ secrets.JWT_SECRET_KEY }}
+          ConnectionStrings__PoolerConnection: ${{ secrets.SUPABASE_CONNECTION_STRING }}
+          Supabase__Url: ${{ secrets.SUPABASE_URL }}
+          Supabase__AnonKey: ${{ secrets.SUPABASE_ANON_KEY }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
