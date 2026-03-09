@@ -1,0 +1,52 @@
+name: Deploy Swagger UI
+
+on:
+  push:
+    branches: [ "merge/FE-BE" ] # Matches current branch. Change to "main" or "master" if needed.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore Backend/VSTEP_Writing_System.slnx
+
+      - name: Build
+        run: dotnet build Backend/VSTEP_Writing_System.slnx --configuration Release --no-restore
+
+      - name: Install Swashbuckle CLI
+        run: dotnet tool restore
+        working-directory: Backend
+
+      - name: Generate Swagger JSON
+        run: |
+          mkdir -p Backend/docs
+          dotnet swagger tofile --output Backend/docs/swagger.json Backend/src/API/bin/Release/net8.0/API.dll v1
+        env:
+          ASPNETCORE_ENVIRONMENT: Development # Swagger is often only enabled in Dev, but we force it for generation
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'Backend/docs'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
