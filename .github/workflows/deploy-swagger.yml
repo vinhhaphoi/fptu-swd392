@@ -2,7 +2,7 @@ name: Deploy Swagger UI
 
 on:
   push:
-    branches: [ "merge/FE-BE" ] # Matches current branch. Change to "main" or "master" if needed.
+    branches: [ "merge/FE-BE" ] # Adjusted to the current branch.
   workflow_dispatch:
 
 permissions:
@@ -34,10 +34,11 @@ jobs:
 
       - name: Generate Swagger JSON
         run: |
-          mkdir -p Backend/docs
-          dotnet swagger tofile --output Backend/docs/swagger.json Backend/src/API/bin/Release/net8.0/API.dll v1
+          mkdir -p docs
+          dotnet swagger tofile --output docs/swagger.json src/API/bin/Release/net8.0/API.dll v1
+        working-directory: Backend
         env:
-          ASPNETCORE_ENVIRONMENT: Development # Swagger is often only enabled in Dev, but we force it for generation
+          ASPNETCORE_ENVIRONMENT: Development
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
