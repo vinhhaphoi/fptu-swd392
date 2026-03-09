@@ -34,9 +34,9 @@ jobs:
 
       - name: Generate Swagger JSON
         run: |
-          mkdir -p ../../docs
-          dotnet swagger tofile --output ../../docs/swagger.json bin/Release/net8.0/API.dll v1
-        working-directory: Backend/src/API
+          mkdir -p docs
+          dotnet swagger tofile --output docs/swagger.json src/API/bin/Release/net8.0/API.dll v1
+        working-directory: Backend
         env:
           ASPNETCORE_ENVIRONMENT: Development
           Jwt__SecretKey: ${{ secrets.JWT_SECRET_KEY }}

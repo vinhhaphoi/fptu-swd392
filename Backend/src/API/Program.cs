@@ -140,4 +140,13 @@ app.MapControllers();
 
 app.Run();  
 
-public partial class Program { }
+public partial class Program 
+{ 
+    // Gợi ý cho các công cụ CLI như Swagger tìm thấy cấu hình Host của ứng dụng
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Program>();
+            });
+}
