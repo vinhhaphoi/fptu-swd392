@@ -25,18 +25,12 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore Backend/VSTEP_Writing_System.slnx
 
-      - name: Build
-        run: dotnet build Backend/VSTEP_Writing_System.slnx --configuration Release --no-restore
-
-      - name: Install Swashbuckle CLI
-        run: dotnet tool restore
-        working-directory: Backend
-
-      - name: Generate Swagger JSON
+      - name: Build and Generate Swagger
         run: |
-          mkdir -p docs
-          dotnet swagger tofile --output docs/swagger.json src/API/bin/Release/net8.0/API.dll v1
-        working-directory: Backend
+          # The build now automatically generates Swagger JSON thanks to Microsoft.Extensions.ApiDescription.Server
+          dotnet build Backend/VSTEP_Writing_System.slnx --configuration Release --no-restore
+          # Rename the auto-generated file (usually v1.json) to swagger.json for the UI
+          mv Backend/docs/v1.json Backend/docs/swagger.json || true
         env:
           ASPNETCORE_ENVIRONMENT: Development
           Jwt__SecretKey: ${{ secrets.JWT_SECRET_KEY }}
