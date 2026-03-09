@@ -30,7 +30,10 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("PoolerConnection")
             ?? configuration.GetConnectionString("DirectConnection");
         if (string.IsNullOrWhiteSpace(connectionString))
-            throw new InvalidOperationException("ConnectionStrings:DirectConnection or PoolerConnection is required.");
+        {
+            // Fallback for Swagger generation or Build-time tools
+            connectionString = "Host=localhost;Database=dummy;Username=dummy;Password=dummy";
+        }
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
 

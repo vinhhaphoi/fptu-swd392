@@ -33,7 +33,7 @@ builder.Services.AddCors(options =>
 });
 
 // Backend-only JWT Authentication (no Supabase Auth)
-var jwtSecret = builder.Configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey is required");
+var jwtSecret = builder.Configuration["Jwt:SecretKey"] ?? "VSTEP-Writing-System-JWT-Secret-Key-Min32Chars!!";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "VSTEP.Backend";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "VSTEP.Client";
 
